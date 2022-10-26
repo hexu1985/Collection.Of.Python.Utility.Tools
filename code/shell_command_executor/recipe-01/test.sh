@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in `seq 1 3`
+for i in `seq 1 10`
 do
     echo "$0-$1 is running..."
     echo "$0-$1 is error..." >&2
