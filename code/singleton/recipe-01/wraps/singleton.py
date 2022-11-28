@@ -2,6 +2,7 @@ import functools
 
 def singleton(cls):
     instances = {}
+
     @functools.wraps(cls)
     def get_instance(*args, **kwargs):
         if cls not in instances:

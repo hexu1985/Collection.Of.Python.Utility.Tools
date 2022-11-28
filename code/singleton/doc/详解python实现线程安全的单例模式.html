@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)https://www.nhooo.com/note/qagock.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>详解python实现线程安全的单例模式 - 经验笔记</title><meta name="baidu-site-verification" content="ATyPlCVtgy"><meta name="applicable-device" content="pc,mobile"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="keywords" content="python 单例模式,示例,教程,笔记,经验,代码片段,代码分享"><meta name="description" content="单例模式是一种常见的设计模式，该模式的主要目的是确保某一个类只有一个实例存在。当你希望在整个系统中，某个类只能出现一个实例时，单例对象就能派上用场。 比如，服务器的配置信息写在一个文件中online.conf中，客户端通过一个 Config"><meta name="renderer" content="webkit"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="icon" href="https://www.nhooo.com/favicon.ico" mce_href="https://www.nhooo.com/favicon.ico" type="image/x-icon"><link rel="stylesheet" href="./详解python实现线程安全的单例模式_files/bootstrap.min.css"> <link href="./详解python实现线程安全的单例模式_files/nhooo.css" rel="stylesheet" type="text/css"><!--[if lt IE 9]><script src="https://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]--><script src="./详解python实现线程安全的单例模式_files/f.txt"></script><script src="./详解python实现线程安全的单例模式_files/f(1).txt"></script><script src="./详解python实现线程安全的单例模式_files/f(2).txt" id="google_shimpl"></script><script src="./详解python实现线程安全的单例模式_files/push.js"></script><script src="./详解python实现线程安全的单例模式_files/hm.js"></script><script src="./详解python实现线程安全的单例模式_files/jquery-1.11.3.min.js" type="text/javascript"></script><script data-ad-client="ca-pub-6463068750811586" async="" src="./详解python实现线程安全的单例模式_files/f(3).txt" data-checked-head="true"></script><meta http-equiv="origin-trial" content="Az6AfRvI8mo7yiW5fLfj04W21t0ig6aMsGYpIqMTaX60H+b0DkO1uDr+7BrzMcimWzv/X7SXR8jI+uvbV0IJlwYAAACFeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A+USTya+tNvDPaxUgJooz+LaVk5hPoAxpLvSxjogX4Mk8awCTQ9iop6zJ9d5ldgU7WmHqBlnQB41LHHRFxoaBwoAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A7FovoGr67TUBYbnY+Z0IKoJbbmRmB8fCyirUGHavNDtD91CiGyHHSA2hDG9r9T3NjUKFi6egL3RbgTwhhcVDwUAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="Az6AfRvI8mo7yiW5fLfj04W21t0ig6aMsGYpIqMTaX60H+b0DkO1uDr+7BrzMcimWzv/X7SXR8jI+uvbV0IJlwYAAACFeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A+USTya+tNvDPaxUgJooz+LaVk5hPoAxpLvSxjogX4Mk8awCTQ9iop6zJ9d5ldgU7WmHqBlnQB41LHHRFxoaBwoAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A7FovoGr67TUBYbnY+Z0IKoJbbmRmB8fCyirUGHavNDtD91CiGyHHSA2hDG9r9T3NjUKFi6egL3RbgTwhhcVDwUAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="Az6AfRvI8mo7yiW5fLfj04W21t0ig6aMsGYpIqMTaX60H+b0DkO1uDr+7BrzMcimWzv/X7SXR8jI+uvbV0IJlwYAAACFeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A+USTya+tNvDPaxUgJooz+LaVk5hPoAxpLvSxjogX4Mk8awCTQ9iop6zJ9d5ldgU7WmHqBlnQB41LHHRFxoaBwoAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A7FovoGr67TUBYbnY+Z0IKoJbbmRmB8fCyirUGHavNDtD91CiGyHHSA2hDG9r9T3NjUKFi6egL3RbgTwhhcVDwUAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><link rel="preload" href="./详解python实现线程安全的单例模式_files/f(4).txt" as="script"><script type="text/javascript" src="./详解python实现线程安全的单例模式_files/f(4).txt"></script><link rel="preload" href="./详解python实现线程安全的单例模式_files/f(4).txt" as="script"><script type="text/javascript" src="./详解python实现线程安全的单例模式_files/f(4).txt"></script><link rel="preload" href="./详解python实现线程安全的单例模式_files/f(4).txt" as="script"><script type="text/javascript" src="./详解python实现线程安全的单例模式_files/f(4).txt"></script></head><body style="padding: 0px 0px 120px;"><div class="navbar navbar-default navbar-static-top navbar-fixed-top"><div class="jz container"><div class="navbar-header"><button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"><span class="sr-only">基础教程</span> <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a class="navbar-brand" href="https://www.nhooo.com/" id="logo">&nbsp;&nbsp;</a><a class="navbar-brand txtlogo" href="https://www.nhooo.com/" title="基础教程">基础教程(nhooo.com)</a></div><div id="navbar" class="navbar-collapse collapse" role="navigation"><ul class="nav navbar-nav" id="top_menu"><li class="dropdown"><a href="https://www.nhooo.com/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">HTML/CSS<span class="caret"></span></a><ul class="dropdown-menu"><li><a href="https://www.nhooo.com/html/html-tutorial.html">HTML基础教程</a></li><li><a href="https://www.nhooo.com/html5/html5-intro.html">HTML5基础教程</a></li><li><a href="https://www.nhooo.com/tags/html-reference.html">HTML参考手册</a></li><li><a href="https://www.nhooo.com/svg/svg-tutorial.html">SVG 教程</a></li><li><a href="https://www.nhooo.com/css/css-tutorial.html">CSS 教程</a></li><li><a href="https://www.nhooo.com/css-reference/css-reference.html">CSS 参考手册</a></li><li><a href="https://www.nhooo.com/css3/css3-tutorial.html">CSS3教程</a></li><li><a href="https://www.nhooo.com/bootstrap/bootstrap-tutorial.html">Bootstrap3 教程</a></li><li><a href="https://www.nhooo.com/bootstrap4/bootstrap4-tutorial.html">Bootstrap4 教程</a></li><li><a href="https://www.nhooo.com/font-awesome/fontawesome-tutorial.html">Font Awesome图标</a></li></ul></li><li class="dropdown"><a href="https://www.nhooo.com/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">JavaScript<span class="caret"></span></a><ul class="dropdown-menu"><li><a href="https://www.nhooo.com/javascript/javascript-tutorial.html">JavaScript 教程</a></li><li><a href="https://www.nhooo.com/jsref/javascript-reference.html">JavaScript 参考手册</a></li><li><a href="https://www.nhooo.com/jquery/jquery-tutorial.html">jQuery 教程</a></li><li><a href="https://www.nhooo.com/ajax/ajax_intro.html">AJAX 教程</a></li><li><a href="https://www.nhooo.com/json/json_intro.html">JSON 教程</a></li><li><a href="https://www.nhooo.com/angularjs/angularjs-tutorial.html">AngularJS 教程</a></li><li><a href="https://www.nhooo.com/reactjs/reactjs-tutorial.html">ReactJS 教程</a></li><li><a href="https://www.nhooo.com/nodejs/nodejs-tutorial.html">NodeJS 教程</a></li></ul></li><li class="dropdown"><a href="https://www.nhooo.com/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">服务端开发<span class="caret"></span></a><ul class="dropdown-menu"><li><a href="https://www.nhooo.com/python/python-tutorial.html">Python 教程</a></li><li><a href="https://www.nhooo.com/cpp/cpp-tutorial.html">C++ 教程</a></li><li><a href="https://www.nhooo.com/golang/golang-tutorial.html">Golang 教程</a></li><li><a href="https://www.nhooo.com/c-programming/c-programming-language-tutorial.html">C 语言教程</a></li><li><a href="https://www.nhooo.com/php/php-tutorial.html">PHP 教程</a></li><li><a href="https://www.nhooo.com/csharp/csharp-tutorial.html">C# 教程</a></li><li><a href="https://www.nhooo.com/linq/linq-tutorial.html">LINQ 教程</a></li><li><a href="https://www.nhooo.com/lua/lua-tutorial.html">Lua 教程</a></li><li><a href="https://www.nhooo.com/ruby/ruby-tutorial.html">Ruby 教程</a></li><li><a href="https://www.nhooo.com/rust/rust-tutorial.html">Rust 教程</a></li><li><a href="https://www.nhooo.com/linux/linux-tutorial.html">Linux 教程</a></li><li><a href="https://www.nhooo.com/r/r-tutorial.html">R 语言教程</a></li><li><a href="https://www.nhooo.com/docker/docker-tutorial.html">Docker 教程</a></li><li><a href="https://www.nhooo.com/scala/scala-tutorial.html">Scala 教程</a></li><li><a href="https://www.nhooo.com/matlab/matlab-tutorial.html">MatLab 教程</a></li><li><a href="https://www.nhooo.com/erlang/erlang-tutorial.html">Erlang 教程</a></li><li><a href="https://www.nhooo.com/pandas/pandas-tutorial.html">Pandas教程</a></li><li><a href="https://www.nhooo.com/numpy/numpy-tutorial.html">Numpy教程</a></li><li><a href="https://www.nhooo.com/matplotlib/matplotlib-tutorial.html">Matplotlib教程</a></li><li><a href="https://www.nhooo.com/flask/flask-tutorial.html">Flask教程</a></li></ul></li><li class="dropdown"><a href="https://www.nhooo.com/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Java教程<span class="caret"></span></a><ul class="dropdown-menu"><li><a href="https://www.nhooo.com/java/java-tutorial.html">Java 教程</a></li><li><a href="https://www.nhooo.com/springboot/springboot-tutorial.html">SpringBoot 教程</a></li><li><a href="https://www.nhooo.com/jdbc/jdbc-tutorial.html">JDBC 教程</a></li><li><a href="https://www.nhooo.com/jsp/jsp-tutorial.html">JSP 教程</a></li><li><a href="https://www.nhooo.com/servlet/servlet-tutorial.html">Servlet 教程</a></li><li><a href="https://www.nhooo.com/maven/maven-tutorial.html">Maven 教程</a></li><li><a href="https://www.nhooo.com/spring/spring-tutorial.html">Spring 教程</a></li><li><a href="https://www.nhooo.com/django/django-tutorial.html">Django 教程</a></li></ul></li><li class="dropdown"><a href="https://www.nhooo.com/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">移动端<span class="caret"></span></a><ul class="dropdown-menu"><li><a href="https://www.nhooo.com/swift/swift-tutorial.html">Swift 教程</a></li><li><a href="https://www.nhooo.com/kotlin/kotlin-tutorial.html">Kotlin 教程</a></li></ul></li><li class="dropdown"><a href="https://www.nhooo.com/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">数据库<span class="caret"></span></a><ul class="dropdown-menu"><li><a href="https://www.nhooo.com/sql/sql-tutorial.html">SQL 教程</a></li><li><a href="https://www.nhooo.com/mongodb/mongodb-tutorial.html">MongoDB 教程</a></li><li><a href="https://www.nhooo.com/sqlite/sqlite-tutorial.html">SQLite 教程</a></li><li><a href="https://www.nhooo.com/postgresql/postgresql-tutorial.html">PostgreSQL 教程</a></li><li><a href="https://www.nhooo.com/mysql/mysql-tutorial.html">MySql 教程</a></li><li><a href="https://www.nhooo.com/redis/redis-tutorial.html">Redis 教程</a></li><li><a href="https://www.nhooo.com/elasticsearch/elasticsearch-tutorial.html">Elasticsearch 教程</a></li></ul></li><li class="dropdown"><a href="https://www.nhooo.com/note/" class="dropdown-toggle" role="button" aria-haspopup="false" aria-expanded="false">经验笔记</a></li><li class="dropdown"><a href="https://www.nhooo.com/tool/" class="dropdown-toggle" role="button" aria-haspopup="false" aria-expanded="false">在线工具</a></li></ul></div></div></div><div class="container" style="height: auto !important;"> 
+ <div class="row" style="height: auto !important;"><div class="accordion" id="accordion2" style="height: auto !important;">
+<div class="accordion-group" style="height: auto !important;">
+<div class="row" style="height: auto !important;">
+<div class="col-xs-12 col-sm-12 col-md-9" style="height: auto !important; min-height: 0px !important;">
+<ol class="breadcrumb">
+<li>所在位置</li>
+<li><a href="https://www.nhooo.com/">首页</a></li>
+<li><a href="https://www.nhooo.com/note/">经验笔记</a></li>
+<li class="active">正文</li>
+</ol>
+<div class="panel panel-default">
+	<div class="note-title"><h1>详解python实现线程安全的单例模式</h1></div>
+	<div class="panel-body note-content">
+	<p>单例模式是一种常见的设计模式，该模式的主要目的是确保某一个类只有一个实例存在。当你希望在整个系统中，某个类只能出现一个实例时，单例对象就能派上用场。</p>
+<p>比如，服务器的配置信息写在一个文件中online.conf中，客户端通过一个 Config 的类来读取配置文件的内容。如果在程序运行期间，有很多地方都需要使用配置文件的内容，那么每个调用配置文件的地方都会创建 Config的实例，这就导致系统中存在多个Config 的实例对象，在配置文件内容很多的情况下，我们就浪费了大量的内存做了同样的事。事实上，对于Config类我们在程序运行期间时只需要一个实例对象即可，这时单例模式就是最好的选择。</p>
+<p>python的模块就是天然的单例模式，这里我们使用修饰器来实现单例模式，以下是代码实现</p>
+
+<pre class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Singleton</span><span class="hljs-params">(cls)</span>:</span>
+ instances = {}
+
+ <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_instance</span><span class="hljs-params">(*args, **kw)</span>:</span>
+  <span class="hljs-keyword">if</span> cls <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> instances:
+   instances[cls] = cls(*args, **kw)
+  <span class="hljs-keyword">return</span> instances[cls]
+
+ <span class="hljs-keyword">return</span> get_instance
+</pre>
+
+<p>代码也很简单，将类传入单例修饰器中，如果该类还未生成实例(instances中不存在该类)，那么就生成一个新的实例返回，并记录在instances中。如果已经instances中已经存在该类，那么直接返回实例instances[cls]。</p>
+<p>那么这段代码是完美的吗？答案是否定的，这段代码不是线程安全的。要实现线程安全需要配合锁的使用，只有占有锁的线程才能继续访问单例实例，看来我们需要再写一个修饰器来实现线程安全了，以下是完整的代码实现和简单的多线程测试用例。</p>
+
+<pre class="hljs python"><span class="hljs-comment">#!/usr/bin/python</span>
+<span class="hljs-comment"># -*- coding: utf-8 -*-</span>
+<span class="hljs-keyword">import</span> threading
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">synchronized</span><span class="hljs-params">(func)</span>:</span>
+ func.__lock__ = threading.Lock()
+
+ <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">synced_func</span><span class="hljs-params">(*args, **kws)</span>:</span>
+  <span class="hljs-keyword">with</span> func.__lock__:
+   <span class="hljs-keyword">return</span> func(*args, **kws)
+
+ <span class="hljs-keyword">return</span> synced_func
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Singleton</span><span class="hljs-params">(cls)</span>:</span>
+ instances = {}
+
+<span class="hljs-meta"> @synchronized</span>
+ <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_instance</span><span class="hljs-params">(*args, **kw)</span>:</span>
+  <span class="hljs-keyword">if</span> cls <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> instances:
+   instances[cls] = cls(*args, **kw)
+  <span class="hljs-keyword">return</span> instances[cls]
+
+ <span class="hljs-keyword">return</span> get_instance
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">worker</span><span class="hljs-params">()</span>:</span>
+ single_test = test()
+ <span class="hljs-keyword">print</span> <span class="hljs-string">"id----&gt; %s"</span> % id(single_test)
+
+<span class="hljs-meta">@Singleton</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">test</span><span class="hljs-params">()</span>:</span>
+ a = <span class="hljs-number">1</span>
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">"__main__"</span>:
+ task_list = []
+ <span class="hljs-keyword">for</span> one <span class="hljs-keyword">in</span> range(<span class="hljs-number">30</span>):
+  t = threading.Thread(target=worker)
+  task_list.append(t)
+ <span class="hljs-keyword">for</span> one <span class="hljs-keyword">in</span> task_list:
+  one.start()
+ <span class="hljs-keyword">for</span> one <span class="hljs-keyword">in</span> task_list:
+  one.join()</pre>
+
+<p>以上就是本文的全部内容，希望对大家的学习有所帮助，也希望大家多多支持呐喊教程。</p>		<p class="gray" id="announce"><p>（熔遁丶螺旋手里剑）</p><p>原文链接：http://www.cnblogs.com/baiyb/p/8506438.html</p>声明：本文内容来源于网络，版权归原作者所有，内容由互联网用户自发贡献自行上传，本网站不拥有所有权，未作人工编辑处理，也不承担相关法律责任。如果您发现有涉嫌版权的内容，欢迎发送邮件至：notice#nhooo.com（发邮件时，请将#更换为@）进行举报，并提供相关证据，一经查实，本站将立刻删除涉嫌侵权内容。 </p>
+		</div>
+	</div>
+<script async="" src="./详解python实现线程安全的单例模式_files/f(3).txt"></script>
+<!-- nhooo_note_view_bottom -->
+<ins class="adsbygoogle" style="display: block; height: 0px;" data-ad-client="ca-pub-6463068750811586" data-ad-slot="5028988258" data-ad-format="auto" data-full-width-responsive="true" data-adsbygoogle-status="done" data-ad-status="unfilled"><div id="aswift_1_host" tabindex="0" title="Advertisement" aria-label="Advertisement" style="border: none; height: 0px; width: 870px; margin: 0px; padding: 0px; position: relative; visibility: visible; background-color: transparent; display: inline-block; overflow: hidden; opacity: 0;"><iframe id="aswift_1" name="aswift_1" style="left: 0px; position: absolute; top: 0px; border: 0px; width: 870px; height: 0px;" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" width="870" height="0" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" src="./详解python实现线程安全的单例模式_files/ads.html" data-google-container-id="a!2" data-google-query-id="CNbW98ff0PsCFVYEgwMdvcAPbQ" data-load-complete="true"></iframe></div></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>	
+	</div>
+	<div class="col-xs-12 col-sm-12 col-md-3" style="height: auto !important; min-height: 0px !important;">
+	<div class="panel panel-default" style="height: auto !important;">
+<script async="" src="./详解python实现线程安全的单例模式_files/f(3).txt"></script>
+<!-- nhooo_square_note_view -->
+<ins class="adsbygoogle" style="display: block; height: 600px;" data-ad-client="ca-pub-6463068750811586" data-ad-slot="7383581059" data-ad-format="auto" data-full-width-responsive="true" data-adsbygoogle-status="done" data-ad-status="filled"><div id="aswift_2_host" tabindex="0" title="Advertisement" aria-label="Advertisement" style="border: none; height: 600px; width: 268px; margin: 0px; padding: 0px; position: relative; visibility: visible; background-color: transparent; display: inline-block; overflow: visible;"><iframe id="aswift_2" name="aswift_2" style="left:0;position:absolute;top:0;border:0;width:268px;height:600px;" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" width="268" height="600" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" src="./详解python实现线程安全的单例模式_files/ads(1).html" data-google-container-id="a!3" data-google-query-id="CND198ff0PsCFYcYcgodzVoGug" data-load-complete="true"></iframe></div></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+		<div class="panel panel-default">
+<div class="panel-heading">基础教程</div>
+<div class="panel panel-body">
+<ul class="list-inline">
+	<li><a href="https://www.nhooo.com/html/html-tutorial.html">HTML基础教程</a></li>
+	<li><a href="https://www.nhooo.com/html5/html5-intro.html">HTML5基础教程</a></li>
+	<li><a href="https://www.nhooo.com/tags/html-reference.html">HTML参考手册</a></li>
+	<li><a href="https://www.nhooo.com/svg/svg-tutorial.html">SVG 教程</a></li>
+	<li><a href="https://www.nhooo.com/css/css-tutorial.html">CSS 教程</a></li>
+	<li><a href="https://www.nhooo.com/css-reference/css-reference.html">CSS 参考手册</a></li>
+	<li><a href="https://www.nhooo.com/css3/css3-tutorial.html">CSS3教程</a></li>
+	<li><a href="https://www.nhooo.com/bootstrap/bootstrap-tutorial.html">Bootstrap3 教程</a></li>
+	<li><a href="https://www.nhooo.com/bootstrap4/bootstrap4-tutorial.html">Bootstrap4 教程</a></li>
+	<li><a href="https://www.nhooo.com/font-awesome/fontawesome-tutorial.html">Font Awesome图标</a></li>
+	
+	<li><a href="https://www.nhooo.com/javascript/javascript-tutorial.html">JavaScript 教程</a></li>
+	<li><a href="https://www.nhooo.com/jsref/javascript-reference.html">JavaScript 参考手册</a></li>
+	<li><a href="https://www.nhooo.com/jquery/jquery-tutorial.html">jQuery 教程</a></li>
+	<li><a href="https://www.nhooo.com/ajax/ajax_intro.html">AJAX 教程</a></li>
+	<li><a href="https://www.nhooo.com/json/json_intro.html">JSON 教程</a></li>
+	<li><a href="https://www.nhooo.com/angularjs/angularjs-tutorial.html">AngularJS 教程</a></li>
+	<li><a href="https://www.nhooo.com/reactjs/reactjs-tutorial.html">ReactJS 教程</a></li>
+	<li><a href="https://www.nhooo.com/nodejs/nodejs-tutorial.html">NodeJS 教程</a></li>
+	
+	<li><a href="https://www.nhooo.com/python/python-tutorial.html">Python 教程</a></li>
+	<li><a href="https://www.nhooo.com/cpp/cpp-tutorial.html">C++ 教程</a></li>
+	<li><a href="https://www.nhooo.com/golang/golang-tutorial.html">Golang 教程</a></li>
+	<li><a href="https://www.nhooo.com/c-programming/c-programming-language-tutorial.html">C 语言教程</a></li>
+	<li><a href="https://www.nhooo.com/php/php-tutorial.html">PHP 教程</a></li>
+	<li><a href="https://www.nhooo.com/csharp/csharp-tutorial.html">C# 教程</a></li>
+	<li><a href="https://www.nhooo.com/linq/linq-tutorial.html">LINQ 教程</a></li>
+	<li><a href="https://www.nhooo.com/lua/lua-tutorial.html">Lua 教程</a></li>
+	<li><a href="https://www.nhooo.com/ruby/ruby-tutorial.html">Ruby 教程</a></li>
+	<li><a href="https://www.nhooo.com/rust/rust-tutorial.html">Rust 教程</a></li>
+	<li><a href="https://www.nhooo.com/linux/linux-tutorial.html">Linux 教程</a></li>
+	<li><a href="https://www.nhooo.com/r/r-tutorial.html">R 语言教程</a></li>
+	<li><a href="https://www.nhooo.com/docker/docker-tutorial.html">Docker 教程</a></li>
+	<li><a href="https://www.nhooo.com/scala/scala-tutorial.html">Scala 教程</a></li>
+	<li><a href="https://www.nhooo.com/matlab/matlab-tutorial.html">MatLab 教程</a></li>
+	<li><a href="https://www.nhooo.com/erlang/erlang-tutorial.html">Erlang 教程</a></li>
+	<li><a href="https://www.nhooo.com/pandas/pandas-tutorial.html">Pandas教程</a></li>
+	<li><a href="https://www.nhooo.com/numpy/numpy-tutorial.html">Numpy教程</a></li>
+	<li><a href="https://www.nhooo.com/matplotlib/matplotlib-tutorial.html">Matplotlib教程</a></li>
+	<li><a href="https://www.nhooo.com/flask/flask-tutorial.html">Flask教程</a></li>
+	
+	<li><a href="https://www.nhooo.com/java/java-tutorial.html">Java 教程</a></li>
+	<li><a href="https://www.nhooo.com/springboot/springboot-tutorial.html">SpringBoot 教程</a></li>
+	<li><a href="https://www.nhooo.com/jdbc/jdbc-tutorial.html">JDBC 教程</a></li>
+	<li><a href="https://www.nhooo.com/jsp/jsp-tutorial.html">JSP 教程</a></li>
+	<li><a href="https://www.nhooo.com/servlet/servlet-tutorial.html">Servlet 教程</a></li>
+	<li><a href="https://www.nhooo.com/maven/maven-tutorial.html">Maven 教程</a></li>
+	<li><a href="https://www.nhooo.com/spring/spring-tutorial.html">Spring 教程</a></li>
+	<li><a href="https://www.nhooo.com/django/django-tutorial.html">Django 教程</a></li>
+	
+	<li><a href="https://www.nhooo.com/swift/swift-tutorial.html">Swift 教程</a></li>
+	<li><a href="https://www.nhooo.com/kotlin/kotlin-tutorial.html">Kotlin 教程</a></li>
+	
+	<li><a href="https://www.nhooo.com/sql/sql-tutorial.html">SQL 教程</a></li>
+	<li><a href="https://www.nhooo.com/mongodb/mongodb-tutorial.html">MongoDB 教程</a></li>
+	<li><a href="https://www.nhooo.com/sqlite/sqlite-tutorial.html">SQLite 教程</a></li>
+	<li><a href="https://www.nhooo.com/postgresql/postgresql-tutorial.html">PostgreSQL 教程</a></li>
+	<li><a href="https://www.nhooo.com/mysql/mysql-tutorial.html">MySql 教程</a></li>
+	<li><a href="https://www.nhooo.com/redis/redis-tutorial.html">Redis 教程</a></li>
+	<li><a href="https://www.nhooo.com/elasticsearch/elasticsearch-tutorial.html">Elasticsearch 教程</a></li>
+	
+  
+</ul></div> </div>
+		<div class="panel panel-default">
+	<div class="panel-heading">猜你喜欢</div>
+	<ul class="list-group">
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagodb.html">keepalived双机热备nginx的配置方法</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagod4.html">Vue 中使用vue2-highcharts实现曲线数据展示的方法</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagoda.html">利用TensorFlow训练简单的二分类神经网络模型的方法</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagodq.html">nodejs爬虫初试superagent和cheerio</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagodh.html">python使用Pycharm创建一个Django项目</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagod3.html">vue项目中引入noVNC远程桌面的方法</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagodg.html">python爬虫基本知识</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagodd.html">用tensorflow构建线性回归模型的示例代码</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagodc.html">vue项目中使用ueditor的实例讲解</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagodf.html">快速处理vue渲染前的显示问题</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagod5.html">c/c++中struct定义、声明、对齐方式解析</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagode.html">Node.js爬取豆瓣数据实例分析</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagocz.html">Windows10下安装Docker的步骤图文教程</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagocy.html">基于Vue渲染与插件的加载顺序的问题详解</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagocl.html">swift中defer几个简单的使用场景详解</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagock.html">详解python实现线程安全的单例模式</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagoc9.html">ubuntu16.04安装ssh服务并实现远程访问的方法</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagoc8.html">AjaxUpLoad.js实现文件上传</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagocx.html">iOS通过shell脚本批量修改属性</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagocw.html">JsChart组件使用详解</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagocm.html">详解Linux中查看jdk安装目录、Linux卸载jdk、rpm命令、rm命令参数</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagoc7.html">Apache开启GZIP压缩功能方法</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagoc6.html">Linux系统中systemctl命令详解</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagocv.html">ionic2中使用自动生成器的方法</a></li>
+<li class="list-group-item"><a href="https://www.nhooo.com/note/qagocu.html">分析python动态规划的递归、非递归实现</a></li>
+</ul> </div>
+
+</div>
+</div>
+</div>	
+ <div class="accordion-group"> </div></div></div></div><script>var ourl = "http://www.cnblogs.com/baiyb/p/8506438.html";var oname = "熔遁丶螺旋手里剑";$('#announce').prepend('<p>原文链接：' + ourl + '</p>');$('#announce').prepend('<p>（' + oname + '）</p>');</script><script src="./详解python实现线程安全的单例模式_files/bootstrap.min.js" type="text/javascript"></script>
+<link rel="stylesheet" href="./详解python实现线程安全的单例模式_files/vs.css"><script src="./详解python实现线程安全的单例模式_files/highlight.pack.js"></script><script>
+hljs.initHighlightingOnLoad();
+$(document).ready(function(){
+  $(".menu-icon").click(function(){
+	$(".col-md-left").toggle();
+	event=arguments.callee.caller.arguments[0] || window.event;
+	event.stopPropagation();	
+});
+if($(".col-md-left").css("display")=="none"){
+	$("html,body").click(function(){
+		$(".col-md-left").hide();
+	});
+	}
+});</script>
+
+<div class="container"><div class="row"><div class="col-sm-12"><p>
+	<a style="color:gray" href="http://www.pcjson.com/" target="_blank">json在线解析</a> <a style="color:gray" href="https://www.txcx.com/" target="_blank">通晓查询</a> <a style="color:gray" href="https://www.henpao.com/" target="_blank">网址大全</a> <a href="http://3g.wp230.com/" target="_blank" style="color:gray">南通白癜风医院</a> <a href="http://www.txbnhh.com/" target="_blank" style="color:gray">神户live</a> <a href="https://ldhzy.com/" target="_blank" style="color:gray">淘宝小号</a> </p></div></div></div>
+<div class="google-auto-placed" style="width: 100%; height: auto; clear: both; text-align: center;"><ins data-ad-format="auto" class="adsbygoogle adsbygoogle-noablate" data-ad-client="ca-pub-6463068750811586" data-adsbygoogle-status="done" style="display: block; margin: 10px auto; background-color: transparent; height: 90px;" data-ad-status="filled"><div id="aswift_3_host" tabindex="0" title="Advertisement" aria-label="Advertisement" style="border: none; height: 90px; width: 1200px; margin: 0px; padding: 0px; position: relative; visibility: visible; background-color: transparent; display: inline-block; overflow: visible;"><iframe id="aswift_3" name="aswift_3" style="left:0;position:absolute;top:0;border:0;width:1200px;height:90px;" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" width="1200" height="90" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" src="./详解python实现线程安全的单例模式_files/ads(2).html" data-google-container-id="a!4" data-google-query-id="CI2Nncjf0PsCFfWFSwUdiaEBRQ" data-load-complete="true"></iframe></div></ins></div><div class="copyright" id="footer"><div class="container"><div class="row"><div class="col-sm-12"><span>Copyright ©2022 <a href="https://www.nhooo.com/">基础教程</a> nhooo.com</span></div></div></div></div><a class="gotop" href="https://www.nhooo.com/note/qagock.html#top" title="返回顶部" style="display: block;"><span class="arrow"></span><span class="arrow lit"></span></a>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?9667322cd19ad1e029a4ba88abf1b2a8";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script><a class="gotop" href="https://www.nhooo.com/note/qagock.html#top" title="返回顶部" style="display: block;"><span class="arrow"></span><span class="arrow lit"></span></a><ins class="adsbygoogle adsbygoogle-noablate" data-adsbygoogle-status="done" style="display: none !important;" data-ad-status="unfilled"><div id="aswift_0_host" tabindex="0" title="Advertisement" aria-label="Advertisement" style="border: none; height: 0px; width: 0px; margin: 0px; padding: 0px; position: relative; visibility: visible; background-color: transparent; display: inline-block;"><iframe id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;border:0;width:undefinedpx;height:undefinedpx;" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" src="./详解python实现线程安全的单例模式_files/ads(3).html" data-google-container-id="a!1" data-load-complete="true"></iframe></div></ins><div class="google-auto-placed" style="width: 100%; height: auto; clear: both; text-align: center;"><ins data-ad-format="auto" class="adsbygoogle adsbygoogle-noablate" data-ad-client="ca-pub-6463068750811586" data-adsbygoogle-status="done" style="display: block; margin: 10px auto; background-color: transparent; height: 90px;" data-ad-status="filled"><div id="aswift_4_host" tabindex="0" title="Advertisement" aria-label="Advertisement" style="border: none; height: 90px; width: 1200px; margin: 0px; padding: 0px; position: relative; visibility: visible; background-color: transparent; display: inline-block; overflow: visible;"><iframe id="aswift_4" name="aswift_4" style="left:0;position:absolute;top:0;border:0;width:1200px;height:90px;" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" width="1200" height="90" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" src="./详解python实现线程安全的单例模式_files/ads(4).html" data-google-container-id="a!5" data-google-query-id="CNnzncjf0PsCFcYZcgodUs8NXw" data-load-complete="true"></iframe></div></ins></div><ins class="adsbygoogle adsbygoogle-noablate" data-adsbygoogle-status="done" data-anchor-status="displayed" style="display: block; width: 100% !important; height: 95px !important; bottom: 0px; clear: none !important; float: none !important; left: 0px; margin: 0px !important; max-height: none !important; max-width: none !important; opacity: 1; overflow: visible !important; padding: 0px !important; position: fixed; right: auto !important; top: auto !important; vertical-align: baseline !important; visibility: visible !important; z-index: 2147483647; background: rgb(250, 250, 250) !important;" data-ad-status="filled" data-anchor-shown="true"><div class="grippy-host"></div><div id="aswift_5_host" tabindex="0" title="Advertisement" aria-label="Advertisement" style="border: none !important; height: 90px !important; width: 100% !important; margin: 0px !important; padding: 0px !important; position: relative !important; visibility: visible !important; background-color: transparent !important; display: inline-block !important; inset: auto !important; clear: none !important; float: none !important; max-height: none !important; max-width: none !important; opacity: 1 !important; overflow: visible !important; vertical-align: baseline !important; z-index: auto !important;"><iframe id="aswift_5" name="aswift_5" style="width: 728px !important; height: 90px !important; display: block; margin: 0px auto;" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" width="728" height="90" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" src="./详解python实现线程安全的单例模式_files/zrt_lookup.html" data-google-container-id="a!6" data-google-query-id="CK3c9cff0PsCFfxJDwIdH6IBdw" data-load-complete="true"></iframe></div></ins><iframe src="./详解python实现线程安全的单例模式_files/aframe.html" width="0" height="0" style="display: none;"></iframe></body><iframe id="google_esf" name="google_esf" src="./详解python实现线程安全的单例模式_files/zrt_lookup(1).html" style="display: none;"></iframe></html>
