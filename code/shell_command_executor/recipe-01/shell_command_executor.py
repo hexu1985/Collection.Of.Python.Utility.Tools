@@ -9,12 +9,12 @@ LOGGER = logging.getLogger()
 class ShellCommandExecutor:
     def __init__(self, cmd, print_func=None):
         self.cmd = cmd
+        self.print_func = print_func
         self.proc = None
         self.pipe_r, self.pipe_w = os.pipe()
-        self.print_func = print_func
         LOGGER.info("create ShellCommandExecutor(cmd=[{}])".format(self.cmd))
 
-    def print_out(self, message):
+    def print_output(self, message):
         if self.print_func:
             self.print_func(message)
         else:
@@ -42,7 +42,7 @@ class ShellCommandExecutor:
 
         output = os.fdopen(self.pipe_r)
         for line in output:
-            self.print_out(line.rstrip())
+            self.print_output(line.rstrip())
 
         ret = self.proc.wait()
         LOGGER.info("cmd: [{}] complete with ret: {}".format(self.cmd, ret))
