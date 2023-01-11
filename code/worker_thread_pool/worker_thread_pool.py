@@ -1,10 +1,8 @@
 
 import threading
 
-from singleton import singleton
 from worker_thread import WorkerThread
 
-@singleton
 class WorkerThreadPool:
     def __init__(self):
         self.thread_pool = dict()
@@ -39,19 +37,20 @@ if __name__ == "__main__":
     import time
 
     LOGGER = logging.getLogger()
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(filename)s [line:%(lineno)d] [tid:%(thread)d] %(levelname)s %(message)s")
+
     class DemoTask:
         def __init__(self, name):
             self.name = name
 
         def __call__(self):
-            print("execute {}".format(self.name))
+            LOGGER.info("execute {}".format(self.name))
             time.sleep(1.0)
 
     print("test of worker_thread.py")
     worker_thread_pool = WorkerThreadPool()
-    worker1 = worker_thread_pool.get_worker_thread("test")
-    worker2 = worker_thread_pool.get_worker_thread("test")
+    worker1 = worker_thread_pool.get_worker_thread("test1")
+    worker2 = worker_thread_pool.get_worker_thread("test2")
 
     print("start task")
     for i in range(1, 5):

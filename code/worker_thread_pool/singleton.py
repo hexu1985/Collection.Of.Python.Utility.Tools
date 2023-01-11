@@ -1,1 +1,0 @@
-../singleton/singleton.py
