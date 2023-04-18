@@ -96,9 +96,9 @@ if __name__ == "__main__":
     cmds = []
 
     ShellCommandExecutor.LOG_DIR="/home/hexu/tmp"
-    cmds.append(ShellCommandExecutor('./workflow/step01/backup/step01_test01.sh', 3))
-    cmds.append(ShellCommandExecutor('./workflow/step01/backup/step01_test02.sh'))
-    cmds.append(ShellCommandExecutor('./nosuchfile.sh'))
+    cmds.append(ShellCommandExecutor("cd /tmp && pwd"))
+    cmds.append(ShellCommandExecutor("./test.sh 3", 3))
+    cmds.append(ShellCommandExecutor("./nosuchfile.sh"))
 
     for cmd in cmds:
         cmd.run()
