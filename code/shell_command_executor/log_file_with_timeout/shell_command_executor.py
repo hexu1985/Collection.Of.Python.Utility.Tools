@@ -1,34 +1,15 @@
 #!/usr/bin/env python3
 
-import os
 import subprocess
 import logging
 import datetime
 import sys
-import os
 import pathlib
 import time
-import psutil
+import os
 import signal
 
 LOGGER = logging.getLogger()
-
-class AllChildPidList:
-    def __init__(self, pid):
-        self.pid = pid
-        self.child_pid_list = []
-
-    def walk(self, pid):
-        p = psutil.Process(pid)
-        for child in p.children():
-            self.child_pid_list.append(child.pid)
-            self.walk(child.pid)
-
-    def get(self):
-        if not self.child_pid_list:
-            self.walk(self.pid)
-
-        return self.child_pid_list
 
 class ShellCommandExecutor:
     LOG_DIR = "/tmp"
@@ -38,6 +19,7 @@ class ShellCommandExecutor:
         self.proc = None
         self.logfile = None
         self.timeout = timeout
+        self.start_time = None
         self.logfile_path = None
         LOGGER.info("create ShellCommandExecutor(cmd=[{}])".format(self.cmd))
 
@@ -54,7 +36,7 @@ class ShellCommandExecutor:
             self.logfile.write("\ncmd [{}] start at {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')))
             self.logfile.write("\n{}\n".format("*"*20))
             self.logfile.flush()
-            self.proc = subprocess.Popen(self.cmd, shell=True, close_fds=True, stdout=self.logfile, stderr=self.logfile)
+            self.proc = subprocess.Popen(self.cmd, shell=True, close_fds=True, stdout=self.logfile, stderr=self.logfile, preexec_fn=os.setpgrp)
             self.start_time = time.time()
             LOGGER.info('run cmd [{}], logfile_path: {}'.format(self.cmd, self.logfile_path))
         except Exception as err:
@@ -65,7 +47,7 @@ class ShellCommandExecutor:
 
     def wait(self):
         if not self.proc:
-            LOGGER.error("cmd: [{}] error not run".format(self.cmd))
+            LOGGER.error("cmd: [{}] is not run".format(self.cmd))
             return -1
 
         try:
@@ -78,10 +60,7 @@ class ShellCommandExecutor:
             self.logfile.flush()
             LOGGER.info("cmd: [{}] complete with ret: {}, logfile_path: {}, escaped time: {}s".format(self.cmd, ret, self.logfile_path, int(now-self.start_time)))
         except subprocess.TimeoutExpired as err:
-            all_child_pid_list = AllChildPidList(self.proc.pid)
-            for pid in all_child_pid_list.get():
-                os.kill(pid, signal.SIGKILL)
-            self.proc.kill()
+            os.killpg(self.proc.pid, signal.SIGTERM)
             self.logfile.write("\n{}\n".format("*"*20))
             self.logfile.write("\ncmd [{}] timeout at {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')))
             self.logfile.flush()
