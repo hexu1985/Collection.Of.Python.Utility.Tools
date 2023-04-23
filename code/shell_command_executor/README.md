@@ -4,8 +4,7 @@
 
 - [最简单版本](simple)
 - [最简单版本增加超时退出, 但有问题](simple_with_timeout_failed)
-- [最简单版本增加超时退出, 手动kill所有子孙进程修复](simple_with_timeout_killpg_manual)
-- [最简单版本增加超时退出, 基于进程组方式修复](simple_with_timeout_killpg_setpgrp)
+- [最简单版本增加超时退出, 手动kill所有子孙进程修复版](simple_with_timeout_fixed)
 - [实现命令的stderr和stdout统一通过print_func打印, 基于os.pipe](print_func_os_pipe)
 - [实现命令的stderr和stdout统一通过print_func打印, 基于subprocess.PIPE](print_func_subprocess_pipe)
 - [实现命令的stderr和stdout统一通过print_func打印, 增加超时退出](print_func_with_timeout)
