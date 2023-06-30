@@ -28,20 +28,13 @@ class AllChildPidList:
         return self.child_pid_list
 
 class ShellCommandExecutor:
-    def __init__(self, cmd, timeout=3600, print_func=None):
+    def __init__(self, cmd, timeout=3600):
         self.cmd = cmd
-        self.print_func = print_func
         self.timeout = timeout
         self.proc = None
         self.start_time = None
         self.pipe_r, self.pipe_w = os.pipe()
         LOGGER.debug("create ShellCommandExecutor(cmd=[{}])".format(self.cmd))
-
-    def print_output(self, message):
-        if self.print_func:
-            self.print_func(message)
-        else:
-            LOGGER.debug("cmd: [{}] output: {}".format(self.cmd, message))
 
     def __str__(self):
         return 'ShellCommandExecutor("{}")'.format(self.cmd)
@@ -64,13 +57,13 @@ class ShellCommandExecutor:
             LOGGER.error("cmd: [{}] is not run".format(self.cmd))
             return -1
 
-        def print_output(cmd, pipe_r, print_func):
+        def print_output(cmd, pipe_r):
             output = os.fdopen(pipe_r)
             for line in output:
-                print_func(line.rstrip())
+                LOGGER.info("cmd: [{}] output: {}".format(self.cmd, line.rstrip()))
             LOGGER.debug("cmd: [{}] output thread exit".format(cmd))
 
-        t = threading.Thread(target=print_output, args=(self.cmd, self.pipe_r, self.print_output), daemon=True)
+        t = threading.Thread(target=print_output, args=(self.cmd, self.pipe_r), daemon=True)
         t.start()
 
         try:
@@ -94,7 +87,7 @@ if __name__ == "__main__":
     cmds = []
 
     cmds.append(ShellCommandExecutor("cd /tmp && pwd"))
-    cmds.append(ShellCommandExecutor("./test.sh 3", 3, print_func=print))
+    cmds.append(ShellCommandExecutor("./test.sh 3", 3))
     cmds.append(ShellCommandExecutor("./nosuchfile.sh"))
 
     for cmd in cmds:
