@@ -7,18 +7,11 @@ import logging
 LOGGER = logging.getLogger()
 
 class ShellCommandExecutor:
-    def __init__(self, cmd, print_func=None):
+    def __init__(self, cmd):
         self.cmd = cmd
-        self.print_func = print_func
         self.proc = None
         self.pipe_r, self.pipe_w = os.pipe()
         LOGGER.info("create ShellCommandExecutor(cmd=[{}])".format(self.cmd))
-
-    def print_output(self, message):
-        if self.print_func:
-            self.print_func(message)
-        else:
-            LOGGER.info("cmd: [{}] output: {}".format(self.cmd, message))
 
     def __str__(self):
         return 'ShellCommandExecutor("{}")'.format(self.cmd)
@@ -42,7 +35,7 @@ class ShellCommandExecutor:
 
         output = os.fdopen(self.pipe_r)
         for line in output:
-            self.print_output(line.rstrip())
+            LOGGER.info("cmd: [{}] output: {}".format(self.cmd, line.rstrip()))
 
         ret = self.proc.wait()
         LOGGER.info("cmd: [{}] complete with ret: {}".format(self.cmd, ret))
@@ -55,7 +48,7 @@ if __name__ == "__main__":
     cmds = []
 
     cmds.append(ShellCommandExecutor("cd /tmp && pwd"))
-    cmds.append(ShellCommandExecutor("./test.sh 3", print_func=print))
+    cmds.append(ShellCommandExecutor("./test.sh 3"))
     cmds.append(ShellCommandExecutor("./nosuchfile.sh"))
 
     for cmd in cmds:
