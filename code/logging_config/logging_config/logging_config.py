@@ -4,12 +4,11 @@ import logging.config
 import os
 import datetime
 
-def init_logging_config(log_root, log_prefix, log_level=logging.INFO):
+def init_logging_config(log_dir, log_prefix, log_level=logging.INFO):
     # logging
     LOG_FILE = os.path.join(
-        log_root,
-        "%s.log.%s" % 
-        (log_prefix, datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f'))
+        log_dir,
+        "{}.log.{}".format(log_prefix, datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f'))
     )
     LOGGING = {
         "version": 1,
@@ -23,12 +22,14 @@ def init_logging_config(log_root, log_prefix, log_level=logging.INFO):
         },
         "handlers": {
             "console": {
-                "level": "DEBUG",
+#               "level": "DEBUG",
+                "level": log_level,
                 "class": "logging.StreamHandler",
                 "formatter": "standard"
             },
             "default": {
-                "level": "INFO",
+#               "level": "INFO",
+                "level": log_level,
                 "class": "logging.handlers.RotatingFileHandler",
                 "filename": LOG_FILE,
                 "maxBytes": 1024 * 1024 * 30,
@@ -47,7 +48,6 @@ def init_logging_config(log_root, log_prefix, log_level=logging.INFO):
     }
     
     logging.config.dictConfig(LOGGING)
-    logging.basicConfig(level=log_level)
 
 if __name__ == '__main__':
     init_logging_config('.', 'test', logging.DEBUG)
