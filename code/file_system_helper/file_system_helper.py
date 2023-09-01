@@ -7,6 +7,7 @@ import sys
 import logging
 import traceback
 import shutil
+import pathlib
 
 LOGGER = logging.getLogger()
 
@@ -40,20 +41,22 @@ class FileSystemHelper:
         return DiskUsageInfo(path)
 
     @staticmethod
-    def RemoveFile(file_path):
-        LOGGER.info("remove file: {}".format(file_path))
+    def RemoveFile(path):
+        LOGGER.info("remove file: {}".format(path))
         try:
-            os.unlink(file_path)
+            os.unlink(path)
+            pass
         except:
-            LOGGER.error("remove file {} failed: {}".format(file_path, traceback.format_exc(limit=1)))
+            LOGGER.error("remove file {} failed: {}".format(path, traceback.format_exc(limit=1)))
 
     @staticmethod
-    def RemoveDirRecursive(dir_path):
-        LOGGER.info("remove dir recursive: {}".format(dir_path))
+    def RemoveDirRecursive(path):
+        LOGGER.info("remove dir recursive: {}".format(path))
         try:
-            shutil.rmtree(dir_path)
+            shutil.rmtree(path)
+            pass
         except:
-            LOGGER.error("remove dir {} failed: {}".format(dir_path, traceback.format_exc(limit=1)))
+            LOGGER.error("remove dir {} failed: {}".format(path, traceback.format_exc(limit=1)))
 
     @staticmethod
     def GetDiskMountpointList(prefix):
@@ -63,6 +66,11 @@ class FileSystemHelper:
                 continue
             mountpoint_list.append(disk.mountpoint)
         return mountpoint_list
+
+    @staticmethod
+    def GetSubDirList(path, pattern):
+        p = pathlib.Path(path)
+        return [d for d in p.glob(pattern) if d.is_dir()]
 
 def test_get_disk_usage_info(path):
     disk_usage_info = FileSystemHelper.GetDiskUsageInfo(path)
@@ -77,8 +85,14 @@ def test_remove_dir_recursive(path):
 def test_get_disk_mountpoint_list(prefix):
     FileSystemHelper.GetDiskMountpointList(prefix)
 
+def test_get_sub_dir_list(path):
+    dir_list = FileSystemHelper.GetSubDirList(path, "*")
+    for d in dir_list:
+        print(d)
+
 if __name__ == "__main__":
     test_get_disk_usage_info("/")
     test_remove_file("/tmp/abc.txt")
     test_remove_dir_recursive("/tmp/abc")
     test_get_disk_mountpoint_list("/media")
+    test_get_sub_dir_list("/home/hexu")
