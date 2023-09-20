@@ -45,7 +45,6 @@ class FileSystemHelper:
         LOGGER.info("remove file: {}".format(path))
         try:
             os.unlink(path)
-            pass
         except:
             LOGGER.error("remove file {} failed: {}".format(path, traceback.format_exc(limit=1)))
 
@@ -54,7 +53,6 @@ class FileSystemHelper:
         LOGGER.info("remove dir recursive: {}".format(path))
         try:
             shutil.rmtree(path)
-            pass
         except:
             LOGGER.error("remove dir {} failed: {}".format(path, traceback.format_exc(limit=1)))
 
@@ -71,6 +69,23 @@ class FileSystemHelper:
     def GetSubDirList(path, pattern):
         p = pathlib.Path(path)
         return [d for d in p.glob(pattern) if d.is_dir()]
+
+    @staticmethod
+    def CreateDirIfNotExist(dir_path):
+        path = pathlib.Path(dir_path)
+        if path.exists():
+            if not path.is_dir():
+                LOGGER.error('path "{}" already exist but not dir'.format(path))
+                return False
+            elif not os.access(dir_path, os.W_OK):
+                LOGGER.error('path "{}" already exist but not write permission'.format(path))
+                return False
+            else:
+                return True
+        else:
+            path.mkdir(parents=True, exist_ok=True)
+            return True
+
 
 def test_get_disk_usage_info(path):
     disk_usage_info = FileSystemHelper.GetDiskUsageInfo(path)
@@ -90,9 +105,14 @@ def test_get_sub_dir_list(path):
     for d in dir_list:
         print(d)
 
+def test_create_dir(path):
+    FileSystemHelper.CreateDirIfNotExist(path)
+
 if __name__ == "__main__":
+    test_create_dir("/tmp/abc")
     test_get_disk_usage_info("/")
     test_remove_file("/tmp/abc.txt")
+    test_remove_dir_recursive("/tmp/abc")
     test_remove_dir_recursive("/tmp/abc")
     test_get_disk_mountpoint_list("/media")
     test_get_sub_dir_list("/home/hexu")
