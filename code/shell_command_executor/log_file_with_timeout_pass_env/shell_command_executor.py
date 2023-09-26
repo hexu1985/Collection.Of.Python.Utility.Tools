@@ -34,14 +34,14 @@ class AllChildPidList:
 class ShellCommandExecutor:
     LOG_DIR = "/tmp"
 
-    def __init__(self, cmd, env=None, timeout=7200):
+    def __init__(self, cmd, env=None, timeout=7200, logfile_path=None):
         self.cmd = cmd
         self.env = env
         self.proc = None
         self.logfile = None
         self.timeout = timeout
         self.start_time = None
-        self.logfile_path = None
+        self.logfile_path = logfile_path
         LOGGER.info("create ShellCommandExecutor(cmd=[{}])".format(self.cmd))
 
     def __str__(self):
@@ -52,7 +52,8 @@ class ShellCommandExecutor:
 
     def run(self):
         try:
-            self.logfile_path = self.LOG_DIR+"/shell_command_executor.log.%s"%datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f')
+            if not self.logfile_path:
+                self.logfile_path = self.LOG_DIR+"/shell_command_executor.log.%s"%datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f')
             self.logfile = open(self.logfile_path, 'w')
             self.logfile.write("\ncmd [{}] start at {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')))
             self.logfile.write("\n{}\n".format("*"*20))
@@ -79,7 +80,9 @@ class ShellCommandExecutor:
             self.logfile.write("\n{}\n".format("*"*20))
             self.logfile.write("\ncmd [{}] end at {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')))
             self.logfile.flush()
+            self.logfile.close()
             LOGGER.info("cmd: [{}] complete with ret: {}, logfile_path: {}, escaped time: {}s".format(self.cmd, ret, self.logfile_path, int(now-self.start_time)))
+            return ret
         except subprocess.TimeoutExpired as err:
             all_child_pid_list = AllChildPidList(self.proc.pid)
             for pid in all_child_pid_list.get():
@@ -88,9 +91,10 @@ class ShellCommandExecutor:
             self.logfile.write("\n{}\n".format("*"*20))
             self.logfile.write("\ncmd [{}] timeout at {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')))
             self.logfile.flush()
+            self.logfile.close()
             LOGGER.info("cmd: [{}] was killed because timeout, logfile_path: {}".format(self.cmd, self.logfile_path))
+            return -1
 
-        self.logfile.close()
 
 
 if __name__ == "__main__":
@@ -121,11 +125,10 @@ if __name__ == "__main__":
 
     cmds = []
 
-    cmds.append(ShellCommandExecutor("./test_env.sh", env=myenv))
-    ShellCommandExecutor.LOG_DIR="/home/hexu/tmp"
+    cmds.append(ShellCommandExecutor("./test_env.sh", env=myenv, logfile_path="/tmp/test_env.log"))
     cmds.append(ShellCommandExecutor("cd /tmp && pwd"))
     cmds.append(ShellCommandExecutor("./test.sh 3", timeout=3))
-    cmds.append(ShellCommandExecutor("./nosuchfile.sh"))
+    cmds.append(ShellCommandExecutor("./nosuchfile.sh", logfile_path="/tmp/nosuchfile.log"))
 
     for cmd in cmds:
         cmd.run()
