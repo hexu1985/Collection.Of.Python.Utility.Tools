@@ -3,6 +3,7 @@
 封装subprocess.Popen
 
 - [最简单版本](simple)
+- [最简单版本增加非阻塞式检查程序是否完成](simple_is_alive)
 - [最简单版本增加设置环境变量](simple_pass_env)
 - [最简单版本增加超时退出, 但有问题](simple_with_timeout_failed)
 - [最简单版本增加超时退出, 手动kill所有子孙进程修复版](simple_with_timeout_fixed)
