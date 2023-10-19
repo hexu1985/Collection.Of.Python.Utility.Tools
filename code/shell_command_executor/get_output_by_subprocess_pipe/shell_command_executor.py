@@ -2,6 +2,7 @@
 
 import subprocess
 import logging
+import threading
 
 LOGGER = logging.getLogger()
 
@@ -22,6 +23,15 @@ class ShellCommandExecutor:
             self.proc = subprocess.Popen(self.cmd, shell=True, close_fds=True,
                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             LOGGER.info('run cmd [{}]'.format(self.cmd))
+
+            def print_output(cmd, output):
+                for line in output:
+                    LOGGER.info("cmd: [{}] output: {}".format(cmd, line.decode().rstrip()))
+                LOGGER.debug("cmd: [{}] output thread exit".format(cmd))
+
+            t = threading.Thread(target=print_output, args=(self.cmd, self.proc.stdout), daemon=True)
+            t.start()
+
         except subprocess.CalledProcessError as err:
             LOGGER.error('run cmd [{}] error: {}'.format(self.cmd, err))
 
@@ -29,9 +39,6 @@ class ShellCommandExecutor:
         if not self.proc:
             LOGGER.error("cmd: [{}] is not run".format(self.cmd))
             return -1
-
-        for line in self.proc.stdout:
-            LOGGER.info("cmd: [{}] output: {}".format(self.cmd, line.decode().rstrip()))
 
         ret = self.proc.wait()
         LOGGER.info("cmd: [{}] complete with ret: {}".format(self.cmd, ret))

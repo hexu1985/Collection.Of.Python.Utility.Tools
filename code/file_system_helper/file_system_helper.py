@@ -34,11 +34,40 @@ class DiskUsageInfo:
 
 
 class FileSystemHelper:
-    """Dir manager."""
 
     @staticmethod
     def GetDiskUsageInfo(path):
         return DiskUsageInfo(path)
+
+
+    @staticmethod
+    def GetFileSize(path):
+        try:
+            f = pathlib.Path(path)
+
+            stat_info = f.lstat()
+            return stat_info.st_size
+
+        except:
+            LOGGER.error("get file size {} failed: {}".format(path, traceback.format_exc(limit=1)))
+            return 0
+
+    @staticmethod
+    def GetDirTotalSize(path):
+        p = pathlib.Path(path)
+        total_size = FileSystemHelper.GetFileSize(path)
+        for f in p.rglob('*'):
+            total_size += FileSystemHelper.GetFileSize(f)
+
+        return total_size
+
+    @staticmethod
+    def GetPathTotalSize(path):
+        p = pathlib.Path(path)
+        if p.is_dir():
+            return FileSystemHelper.GetDirTotalSize(path)
+        else:
+            return FileSystemHelper.GetFileSize(path)
 
     @staticmethod
     def RemoveFile(path):
@@ -98,7 +127,7 @@ def test_remove_dir_recursive(path):
     FileSystemHelper.RemoveDirRecursive(path)
 
 def test_get_disk_mountpoint_list(prefix):
-    FileSystemHelper.GetDiskMountpointList(prefix)
+    print(FileSystemHelper.GetDiskMountpointList(prefix))
 
 def test_get_sub_dir_list(path):
     dir_list = FileSystemHelper.GetSubDirList(path, "*")
@@ -108,6 +137,9 @@ def test_get_sub_dir_list(path):
 def test_create_dir(path):
     FileSystemHelper.CreateDirIfNotExist(path)
 
+def test_get_path_total_size(path):
+    print("{} size: {}".format(path, FileSystemHelper.GetPathTotalSize(path)))
+
 if __name__ == "__main__":
     test_create_dir("/tmp/abc")
     test_get_disk_usage_info("/")
@@ -116,3 +148,4 @@ if __name__ == "__main__":
     test_remove_dir_recursive("/tmp/abc")
     test_get_disk_mountpoint_list("/media")
     test_get_sub_dir_list("/home/hexu")
+    test_get_path_total_size("/tmp")
