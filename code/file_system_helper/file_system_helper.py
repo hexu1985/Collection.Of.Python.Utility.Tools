@@ -39,7 +39,6 @@ class FileSystemHelper:
     def GetDiskUsageInfo(path):
         return DiskUsageInfo(path)
 
-
     @staticmethod
     def GetFileSize(path):
         try:
@@ -53,10 +52,10 @@ class FileSystemHelper:
             return 0
 
     @staticmethod
-    def GetDirTotalSize(path):
+    def GetDirTotalSize(path, file_pattern='*'):
         p = pathlib.Path(path)
         total_size = FileSystemHelper.GetFileSize(path)
-        for f in p.rglob('*'):
+        for f in p.rglob(file_pattern):
             total_size += FileSystemHelper.GetFileSize(f)
 
         return total_size
@@ -137,6 +136,9 @@ def test_get_sub_dir_list(path):
 def test_create_dir(path):
     FileSystemHelper.CreateDirIfNotExist(path)
 
+def test_dir_total_size(path, file_pattern):
+    print("{} of {} size: {}".format(file_pattern, path, FileSystemHelper.GetDirTotalSize(path, file_pattern)))
+
 def test_get_path_total_size(path):
     print("{} size: {}".format(path, FileSystemHelper.GetPathTotalSize(path)))
 
@@ -148,4 +150,5 @@ if __name__ == "__main__":
     test_remove_dir_recursive("/tmp/abc")
     test_get_disk_mountpoint_list("/media")
     test_get_sub_dir_list("/home/hexu")
-    test_get_path_total_size("/tmp")
+    test_dir_total_size("..", "*.py")
+    test_get_path_total_size("..")
