@@ -33,6 +33,9 @@ class DataFileCleaner:
 
     def GetDeleteFileList(self):
         file_list = self.list_file_by_mtime()
+        if len(file_list) == 0:
+            return file_list
+
         total_size = 0
         for i, file_info in enumerate(file_list):
             total_size += file_info.size
