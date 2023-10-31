@@ -24,7 +24,7 @@ class DataFileCleaner:
             file_info = DataFileInfo(name = f.name,
                     path = str(f), 
                     size = stat_info.st_size,
-                    mtime = stat_info.st_ctime)
+                    mtime = stat_info.st_mtime)
             file_list.append(file_info)
 
         file_list.sort(key = lambda f: f.mtime, reverse=True)
