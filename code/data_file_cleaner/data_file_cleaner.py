@@ -31,17 +31,18 @@ class DataFileCleaner:
 
         return file_list
 
-    def GetDeleteFileList(self):
+    def GetDeleteFileInfoList(self):
         file_list = self.list_file_by_mtime()
-        if len(file_list) == 0:
-            return file_list
 
         total_size = 0
         for i, file_info in enumerate(file_list):
             total_size += file_info.size
             if total_size >= self.storage_bytes_upper_limit:
-                break
-        return file_list[max(i, self.remain_lastest_file_number):]
+                return file_list[max(i, self.remain_lastest_file_number):]
+        return []
+
+    def GetDeleteFileList(self):
+        return [file_info.path for file_info in self.GetDeleteFileInfoList()]
 
 def test_list_file_by_mtime(data_file_cleaner):
     for file_info in data_file_cleaner.list_file_by_mtime():
