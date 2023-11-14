@@ -111,7 +111,7 @@ $ sudo chmod a+x NVIDIA-Linux-*******.run    //NVIDIA-Linux-*******.run 表示�
 接着命令行输入以下命令：
 
 ```
-$ sudo bash ./NVIDIA-Linux-*******.run //NVIDIA-Linux-*******.run 表示你下载的驱动程序安装文件
+$ sudo sh ./NVIDIA-Linux-*******.run //NVIDIA-Linux-*******.run 表示你下载的驱动程序安装文件
 ```
 接着按照安装提示进行Nvidia驱动的安装。
 
@@ -150,8 +150,79 @@ Tue Nov 14 16:46:28 2023
 +-----------------------------------------------------------------------------+
 ```
 
+---
+
+### Linux下安装cuda和对应版本的cudnn
+
+1.首先在安装cuda与cudnn之前，系统需要成功安装Nvidia驱动
+
+2.验证系统内部是否已经安装了cuda
+打开命令行，输入以下命令：
+
+```
+$ nvcc -V
+```
+若出现以下输出，则系统内部没有安装cuda。
+
+```
+Command 'nvcc' not found, but can be installed with:
+
+sudo apt install nvidia-cuda-toolkit
+```
+
+3.进行cuda安装包与cudnn的下载
+
+- cuda的下载链接：[cuda下载链接](https://developer.nvidia.com/cuda-toolkit-archive)
+- cudnn的下载链接：[cudnn下载链接](https://developer.nvidia.com/cudnn)
+
+在下载这两个文件的时候，需要注意cudnn的版本需要与cuda的版本相匹配。
+
+NVIDIA显卡驱动版本和CUDA版本对应关系可以去下面网站检查：
+<https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html>
+
+4.进行cuda的安装
+在进行cuda安装之前，我们需要先安装cuda的相关依赖库，防止cuda安装出现错误。命令行输入以下命令，进行相关依赖库的安装：
+
+```
+$ sudo apt-get install freeglut3-dev build-essential libx11-dev libxmu-dev libxi-dev libgl1-mesa-glx libglu1-mesa libglu1-mesa-dev
+```
+
+随后输入以下命令进行cuda的安装：
+
+```
+$ sudo sh cuda_XX.X.XX_XXX.XX_linux.run
+ Installation failed. See log at /var/log/cuda-installer.log for details.
+```
+
+随后，我们开始进行环境变量的配置：
+
+打开命令行输入以下命令进行～/.bashrc文件的修改：
+
+```
+$ vim ~/.bashrc
+```
+
+在文件的末尾加入下面三行：
+
+```
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
+export PATH=$PATH:/usr/local/cuda/bin
+export CUDA_HOME=$CUDA_HOME:/usr/local/cuda
+```
+
+随后命令行输入以下命令保存并退出：
+
+:wq!
+在添加完环境变量后，需要更新一下环境变量，命令行输入以下命令进行环境变量的更新：
+
+source ~/.bashrc
+
+
+
+
 - [linux服务器上查看显卡(nvidia)型号](https://zhuanlan.zhihu.com/p/391087399)
 - [Linux下Nvidia驱动的安装](https://blog.csdn.net/qq_44961869/article/details/115945912?utm_source=app&app_version=4.6.1)
 - [Ubuntu 卸载 Nvidia 驱动和安装最新驱动](https://blog.csdn.net/wm9028/article/details/110268030)
 - [Linux下安装cuda和对应版本的cudnn](https://blog.csdn.net/qq_44961869/article/details/115954258)
 - [Linux（多用户下）查看cuda、cudnn版本、查看已经安装的cuda版本、切换不同版本cuda之间的切换等相关命令](https://blog.csdn.net/Kefenggewu_/article/details/117675079)
+- [CUDA、cuDNN以及pytorch的版本选择和下载](https://blog.csdn.net/xiaozhu_daidai/article/details/122156601)
