@@ -68,7 +68,7 @@ $ lspci | grep -i nvidia
 
 3.安装Nvidia驱动程序的准备
 
-禁用nouveau驱动：
+(1) 禁用nouveau驱动：
 打开禁用配置文件，命令行输入以下命令：
 
 ```
@@ -99,7 +99,56 @@ $ lsmod | grep nouveau
 ```
 如果没有输出，则代表nouveau禁用成功。
 
+(2) Bios禁用secure boot
+根据不同电脑型号，进入Bios，将secure boot（有些电脑名称为：安全启动项）设置为disable
 
+4.Nvidia驱动正式安装
+给第2步下载的驱动程序安装文件增加可执行权限，驱动文件所在目录打开命令行，输入以下命令：
+
+```
+$ sudo chmod a+x NVIDIA-Linux-*******.run    //NVIDIA-Linux-*******.run 表示你下载的驱动程序安装文件
+```
+接着命令行输入以下命令：
+
+```
+$ sudo bash ./NVIDIA-Linux-*******.run //NVIDIA-Linux-*******.run 表示你下载的驱动程序安装文件
+```
+接着按照安装提示进行Nvidia驱动的安装。
+
+```
+see the file /usr/share/doc/NVIDIA_GLX-1.0/README.txt for details.
+```
+
+5.Nvidia驱动安装是否成功验证
+命令行输入以下命令验证安装是否成功：
+
+```
+$ nvidia-smi
+```
+如果出现以下输出则安装成功：
+
+```
+Tue Nov 14 16:46:28 2023
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 470.223.02   Driver Version: 470.223.02   CUDA Version: 11.4     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  Off  | 00000000:01:00.0 Off |                  N/A |
+| N/A   57C    P0    22W /  N/A |      0MiB /  5926MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+```
 
 - [linux服务器上查看显卡(nvidia)型号](https://zhuanlan.zhihu.com/p/391087399)
 - [Linux下Nvidia驱动的安装](https://blog.csdn.net/qq_44961869/article/details/115945912?utm_source=app&app_version=4.6.1)
