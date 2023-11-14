@@ -2,13 +2,14 @@
 
 import paramiko
 import time
-import getpass
+import pathlib
+
+private_key = paramiko.RSAKey.from_private_key_file(pathlib.Path.home()/'.ssh'/'id_rsa')
 
 ssh_client = paramiko.SSHClient()
 
 ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-password=getpass.getpass()
-ssh_client.connect(hostname="192.168.70.128", port=22, username='hexu', password=password, look_for_keys=False, allow_agent=False)
+ssh_client.connect(hostname="192.168.199.102", port=8007, username='apollo', pkey=private_key)
 
 stdin, stdout, stderr = ssh_client.exec_command('df -hT') 
 
