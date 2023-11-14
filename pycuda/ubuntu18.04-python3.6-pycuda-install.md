@@ -1,3 +1,8 @@
+## Hands-On install pycuda
+
+- install nvidia driver
+- install cuda and cudnn
+- install numpy and pycuda
 
 ### Linux下Nvidia驱动的安装
 
@@ -60,6 +65,39 @@ $ lspci | grep -i nvidia
 <https://admin.pci-ids.ucw.cz/mods/PC/10de?action=help?help=pci>
 
 从该网址下载与显卡型号对应的显卡驱动程序：[英伟达驱动下载](https://www.nvidia.cn/geforce/drivers/)
+
+3.安装Nvidia驱动程序的准备
+
+禁用nouveau驱动：
+打开禁用配置文件，命令行输入以下命令：
+
+```
+$ sudo vim /etc/modprobe.d/blacklist.conf
+```
+
+在最后一行添加以下文本：
+
+```
+blacklist nouveau
+```
+
+保存并退出：
+
+```
+:qw!
+```
+
+修改完成之后，更新一下文件配置，命令行输入以下命令：
+
+```
+$ sudo update-initramfs -u
+```
+执行完毕需要进行电脑重启，重启电脑之后，命令行输入以下命令：
+
+```
+$ lsmod | grep nouveau
+```
+如果没有输出，则代表nouveau禁用成功。
 
 
 
