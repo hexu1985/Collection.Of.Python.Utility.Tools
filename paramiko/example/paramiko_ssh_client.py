@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import paramiko
-import time
 import getpass
 
 ssh_client = paramiko.SSHClient()
