@@ -4,6 +4,8 @@
 - install cuda and cudnn
 - install numpy and pycuda
 
+---
+
 ### Linux下Nvidia驱动的安装
 
 1.查看Linux系统是否已经安装了Nvidia驱动
@@ -173,7 +175,7 @@ sudo apt install nvidia-cuda-toolkit
 3.进行cuda安装包与cudnn的下载
 
 - cuda的下载链接：[cuda下载链接](https://developer.nvidia.com/cuda-toolkit-archive)
-- cudnn的下载链接：[cudnn下载链接](https://developer.nvidia.com/cudnn)
+- cudnn的下载链接：[cudnn下载链接](https://developer.nvidia.com/rdp/cudnn-archive)
 
 在下载这两个文件的时候，需要注意cudnn的版本需要与cuda的版本相匹配。
 
@@ -191,8 +193,34 @@ $ sudo apt-get install freeglut3-dev build-essential libx11-dev libxmu-dev libxi
 
 ```
 $ sudo sh cuda_XX.X.XX_XXX.XX_linux.run
- Installation failed. See log at /var/log/cuda-installer.log for details.
 ```
+
+正常情况输出类似：
+
+```
+$ sudo bash cuda_11.1.1_455.32.00_linux.run
+===========
+= Summary =
+===========
+
+Driver:   Not Selected
+Toolkit:  Installed in /usr/local/cuda-11.1/
+Samples:  Installed in /home/hexu/
+
+Please make sure that
+ -   PATH includes /usr/local/cuda-11.1/bin
+ -   LD_LIBRARY_PATH includes /usr/local/cuda-11.1/lib64, or, add /usr/local/cuda-11.1/lib64 to /etc/ld.so.conf and run ldconfig as root
+
+To uninstall the CUDA Toolkit, run cuda-uninstaller in /usr/local/cuda-11.1/bin
+***WARNING: Incomplete installation! This installation did not install the CUDA Driver. A driver of version at least 455.00 is required for CUDA 11.1 functionality to work.
+To install the driver using this installer, run the following command, replacing <CudaInstaller> with the name of this run file:
+    sudo <CudaInstaller>.run --silent --driver
+
+Logfile is /var/log/cuda-installer.log
+```
+
+如果系统可以运行nvidia-smi，说明已经安装好了cuda的驱动，此时一定要在下个界面通过按回车取消Driver的安装，
+否则会出现[ERROR]: Install of driver component failed.的情况。
 
 随后，我们开始进行环境变量的配置：
 
@@ -212,11 +240,43 @@ export CUDA_HOME=$CUDA_HOME:/usr/local/cuda
 
 随后命令行输入以下命令保存并退出：
 
+```
 :wq!
+```
+
 在添加完环境变量后，需要更新一下环境变量，命令行输入以下命令进行环境变量的更新：
 
+```
 source ~/.bashrc
+```
 
+此时再运行nvcc -V，即可发现cuda已安装成功：
+
+```
+$ nvcc -V
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2020 NVIDIA Corporation
+Built on Mon_Oct_12_20:09:46_PDT_2020
+Cuda compilation tools, release 11.1, V11.1.105
+Build cuda_11.1.TC455_06.29190527_0
+```
+
+5. 进行cudnn的安装
+
+进入到cudnn下载的安装路径下，命令行输入以下命令进行解压操作：
+
+```
+$ tar -xzvf cudnn-10.1-linux-x64-v8.0.5.39.tgz //这里cudnn-10.1-linux-x64-v8.0.5.39.tgz是我们下载的cudnn的压缩包
+```
+
+随后在当前路径的命令行终端输入以下三条命令进行cudnn的安装：
+
+```
+$ sudo cp -r cuda/include/*    /usr/local/cuda/include/
+$ sudo cp -r cuda/lib64/libcudnn*    /usr/local/cuda/lib64/
+```
+
+至此cuda与cudnn全部安装成功。
 
 
 
@@ -226,3 +286,5 @@ source ~/.bashrc
 - [Linux下安装cuda和对应版本的cudnn](https://blog.csdn.net/qq_44961869/article/details/115954258)
 - [Linux（多用户下）查看cuda、cudnn版本、查看已经安装的cuda版本、切换不同版本cuda之间的切换等相关命令](https://blog.csdn.net/Kefenggewu_/article/details/117675079)
 - [CUDA、cuDNN以及pytorch的版本选择和下载](https://blog.csdn.net/xiaozhu_daidai/article/details/122156601)
+- [Ubuntu18.04安装cuda+ ERROR: Install of driver component failed.的解决](https://blog.csdn.net/dream6985/article/details/125124730)
+
