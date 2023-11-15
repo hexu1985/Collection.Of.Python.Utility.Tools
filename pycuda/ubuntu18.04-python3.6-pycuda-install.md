@@ -278,6 +278,21 @@ $ sudo cp -r cuda/lib64/libcudnn*    /usr/local/cuda/lib64/
 
 至此cuda与cudnn全部安装成功。
 
+---
+
+### ubuntu安装pyCUDA
+
+1.安装pyCUDA之前必须安装CUDA
+
+2.安装pyCUDA
+
+只需要执行下面命令：
+```
+$ python3 -m pip install pycuda
+```
+
+如果需要安装指定版本的pycuda可以去github上下载压缩包([pycuda release download](https://github.com/inducer/pycuda/tags))，
+安装步骤参考[Installing PyCUDA on Linux](https://wiki.tiker.net/PyCuda/Installation/Linux/)。
 
 
 - [linux服务器上查看显卡(nvidia)型号](https://zhuanlan.zhihu.com/p/391087399)
@@ -287,4 +302,4 @@ $ sudo cp -r cuda/lib64/libcudnn*    /usr/local/cuda/lib64/
 - [Linux（多用户下）查看cuda、cudnn版本、查看已经安装的cuda版本、切换不同版本cuda之间的切换等相关命令](https://blog.csdn.net/Kefenggewu_/article/details/117675079)
 - [CUDA、cuDNN以及pytorch的版本选择和下载](https://blog.csdn.net/xiaozhu_daidai/article/details/122156601)
 - [Ubuntu18.04安装cuda+ ERROR: Install of driver component failed.的解决](https://blog.csdn.net/dream6985/article/details/125124730)
-
+- [Installing PyCUDA on Linux](https://wiki.tiker.net/PyCuda/Installation/Linux/)
