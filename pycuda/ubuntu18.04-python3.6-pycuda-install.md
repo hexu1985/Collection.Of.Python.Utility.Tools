@@ -4,6 +4,11 @@
 - install cuda and cudnn
 - install numpy and pycuda
 
+我的安装环境：
+- 操作系统：Ubuntu18.04
+- 显卡：NVIDIA RTX 2060
+- Python版本：2.7.1/3.6.9
+
 ---
 
 ### Linux下Nvidia驱动的安装
@@ -286,14 +291,24 @@ $ sudo cp -r cuda/lib64/libcudnn*    /usr/local/cuda/lib64/
 
 2.安装pyCUDA
 
-只需要执行下面命令：
+只需要执行：
+
 ```
-$ python3 -m pip install pycuda
+$ python -m pip install -i http://pypi.douban.com/simple --trusted-host pypi.douban.com  pycuda
+$ python3 -m pip install -i http://pypi.douban.com/simple --trusted-host pypi.douban.com  pycuda
 ```
+
+但安装的pycuda版本可能比较旧。
 
 如果需要安装指定版本的pycuda可以去github上下载压缩包([pycuda release download](https://github.com/inducer/pycuda/tags))，
 安装步骤参考[Installing PyCUDA on Linux](https://wiki.tiker.net/PyCuda/Installation/Linux/)。
 
+python2.7和python3.6的版本都太老了，自己编译pycuda或者跑pycuda的示例代码，可能会有各种坑，这里就不填了，
+建议将Ubuntu的系统升级，然后使用系统自带的高版本的Python3去编译安装pycuda。
+
+---
+
+### 参考资料
 
 - [linux服务器上查看显卡(nvidia)型号](https://zhuanlan.zhihu.com/p/391087399)
 - [Linux下Nvidia驱动的安装](https://blog.csdn.net/qq_44961869/article/details/115945912?utm_source=app&app_version=4.6.1)
@@ -302,4 +317,6 @@ $ python3 -m pip install pycuda
 - [Linux（多用户下）查看cuda、cudnn版本、查看已经安装的cuda版本、切换不同版本cuda之间的切换等相关命令](https://blog.csdn.net/Kefenggewu_/article/details/117675079)
 - [CUDA、cuDNN以及pytorch的版本选择和下载](https://blog.csdn.net/xiaozhu_daidai/article/details/122156601)
 - [Ubuntu18.04安装cuda+ ERROR: Install of driver component failed.的解决](https://blog.csdn.net/dream6985/article/details/125124730)
+- [ubuntu安装pyCUDA](https://blog.csdn.net/JohnJim0/article/details/100585885)
 - [Installing PyCUDA on Linux](https://wiki.tiker.net/PyCuda/Installation/Linux/)
+- [python3.6-pycuda-2021.1](https://github.com/jetson-nano-wheels/python3.6-pycuda-2021.1)
