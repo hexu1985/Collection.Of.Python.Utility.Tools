@@ -1,15 +1,17 @@
 #!/usr/bin/python3
 
 import paramiko
-import getpass
+import pathlib
 
 ssh_client = paramiko.SSHClient()
-
 ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-password=getpass.getpass()
-ssh_client.connect(hostname="192.168.70.128", port=22, username='hexu', password=password, look_for_keys=False, allow_agent=False)
+if 0:
+    ssh_client.load_system_host_keys()
+else:
+    ssh_client.load_host_keys(pathlib.Path.home()/'.ssh'/'id_rsa')
+ssh_client.connect(hostname="192.168.199.102", port=8007, username='apollo')
 
-stdin, stdout, stderr = ssh_client.exec_command('cat /nosuch') 
+stdin, stdout, stderr = ssh_client.exec_command('df -hT') 
 
 # 输出返回信息
 stdout_info = stdout.read().decode('utf8')
