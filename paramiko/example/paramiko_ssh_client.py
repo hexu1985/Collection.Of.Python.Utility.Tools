@@ -7,9 +7,10 @@ ssh_client = paramiko.SSHClient()
 
 ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 password=getpass.getpass()
-ssh_client.connect(hostname="192.168.70.128", port=22, username='hexu', password=password, look_for_keys=False, allow_agent=False)
+#ssh_client.connect(hostname="192.168.70.128", port=22, username='hexu', password=password, look_for_keys=False, allow_agent=False)
+ssh_client.connect(hostname="192.168.70.128", port=22, username='hexu', password=password)
 
-stdin, stdout, stderr = ssh_client.exec_command('cat /nosuch') 
+stdin, stdout, stderr = ssh_client.exec_command('df -h') 
 
 # 输出返回信息
 stdout_info = stdout.read().decode('utf8')
