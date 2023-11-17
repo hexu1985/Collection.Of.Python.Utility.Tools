@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+import io
 import paramiko
 from remote_host_info import RemoteHostInfo
 
@@ -33,13 +34,26 @@ class RemoteShellCommandExecutor:
         return sftp
 
     class ExecuteException(Exception):
-        pass
+        def __init__(self, host_info, command, error_msg):
+            super().__init__(host_info, command, error_msg)
+            self.host_info = host_info
+            self.command = command
+            self.error_msg = error_msg
+
+        def __str__(self):
+            string_io = io.StringIO()
+            string_io.write("RemoteShellCommandExecutor.ExecuteException:\n")
+            string_io.write("host_info: {}\n".format(self.host_info))
+            string_io.write("command: {}\n".format(self.command))
+            string_io.write("error_msg: \n{}\n".format(self.error_msg))
+            string_io.seek(0)
+            return str(string_io.read())
 
     def exec_command(self, command, timeout=None):
         stdin, stdout, stderr = self.ssh_client.exec_command(command=command, timeout=timeout)
         stderr_info = stderr.read().decode('utf8')
         if stderr_info:
-            raise RemoteShellCommandExecutor.ExecuteException(self.remote_host_info, command, stderr_info)
+            raise RemoteShellCommandExecutor.ExecuteException(self.host_info, command, stderr_info)
         stdout_info = stdout.read().decode('utf8')
         return stdout_info
 
