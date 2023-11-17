@@ -14,6 +14,7 @@ sftp = ssh_client.open_sftp()
 put_info = sftp.put("./test.sh", "/tmp/test.sh", confirm=True)
 print(put_info)
 print("上传test.sh完成")
+sftp.close()
 
 stdin, stdout, stderr = ssh_client.exec_command('TEST_VAR=abc bash /tmp/test.sh') 
 
