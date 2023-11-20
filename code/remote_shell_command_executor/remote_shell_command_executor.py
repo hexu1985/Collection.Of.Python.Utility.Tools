@@ -10,7 +10,7 @@ class RemoteShellCommandExecutor:
         self.host_info = host_info
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.sftp_list = []
+        self.sftp_client = None
 
     def connect(self, timeout=None):
         hostname = self.host_info.hostname
@@ -24,14 +24,16 @@ class RemoteShellCommandExecutor:
             self.ssh_client.connect(hostname=hostname, port=port, username=username, password=password)
 
     def close(self):
-        for sftp in self.sftp_list:
-            sftp.close()
+        if self.sftp_client:
+            self.sftp_client.close()
+            self.sftp_client = None
         self.ssh_client.close()
 
     def open_sftp(self):
-        sftp = self.ssh_client.open_sftp()
-        self.sftp_list.append(sftp)
-        return sftp
+        if self.sftp_client:
+            return self.sftp_client
+        self.sftp_client = self.ssh_client.open_sftp()
+        return self.sftp_client
 
     class ExecuteException(Exception):
         def __init__(self, host_info, command, error_msg):
