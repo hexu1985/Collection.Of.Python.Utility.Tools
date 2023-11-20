@@ -29,7 +29,7 @@ class RemoteShellCommandExecutor:
             self.sftp_client = None
         self.ssh_client.close()
 
-    def open_sftp(self):
+    def get_sftp(self):
         if self.sftp_client:
             return self.sftp_client
         self.sftp_client = self.ssh_client.open_sftp()

@@ -10,7 +10,7 @@ import sys
 
 def test_ssh_client_raise_exception(remote_executor):
     try: 
-        sftp = remote_executor.open_sftp()
+        sftp = remote_executor.get_sftp()
         sftp.put("./raise_exception.py", "/tmp/raise_exception.py")
         print(remote_executor.exec_command('python3 /tmp/raise_exception.py'))
     except Exception as e:
