@@ -12,14 +12,14 @@ tran.connect(username='hexu', password=password)
 
 sftp = paramiko.SFTPClient.from_transport(tran)
 
-local_path = __file__
-remote_path = '/tmp/paramiko_sftp_client.py'
+local_path = "./test_link.sh"
+remote_path = '/tmp/test_link.sh'
 
 put_info = sftp.put(local_path, remote_path, confirm=True)
 print(put_info)
 print(f"上传{local_path}完成")
 
-save_path = '/tmp/paramiko_sftp_client.py'
+save_path = '/tmp/test_link.sh'
 sftp.get(remotepath=remote_path, localpath=save_path)
 print(f'下载{save_path}完成')
 
