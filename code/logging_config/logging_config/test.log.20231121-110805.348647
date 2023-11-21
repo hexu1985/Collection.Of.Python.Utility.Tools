@@ -1,0 +1,4 @@
+[DEBUG][2023-11-21 11:08:05,348][MainThread:139745226041152][logging_config.py:55] hello debug
+[INFO][2023-11-21 11:08:05,348][MainThread:139745226041152][logging_config.py:56] hello info
+[ERROR][2023-11-21 11:08:05,348][MainThread:139745226041152][logging_config.py:57] hello error
+[WARNING][2023-11-21 11:08:05,349][MainThread:139745226041152][logging_config.py:58] hello warning
