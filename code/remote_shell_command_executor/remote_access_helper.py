@@ -37,6 +37,10 @@ class RemoteAccessHelper:
         cmd = 'tar czvf "{}" "{}"'.format(src_dir, dst_file_path)
         self.ssh_client.exec_command(cmd)
 
+    def put_file(self, local_file, remote_file):
+        sftp = self.ssh_client.get_sftp()
+        return sftp.put(local_file, remote_file)
+
     def put_dir(self, local_dir, remote_dir, file_pattern="*"):
         sftp = self.ssh_client.get_sftp()
         local_dir_path = pathlib.Path(local_dir)
@@ -45,4 +49,8 @@ class RemoteAccessHelper:
             remote_file = remote_dir_path/local_file.name 
             sftp.put(localpath=str(local_file), remotepath=str(remote_file))
 
-    
+    def list_dir(self, remote_dir):
+        sftp = self.ssh_client.get_sftp()
+        return sftp.listdir(remote_dir)
+
+
