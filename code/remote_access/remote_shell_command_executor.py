@@ -3,7 +3,7 @@
 
 import io
 import paramiko
-from remote_host_info import RemoteHostInfo
+from remote_access.remote_host_info import RemoteHostInfo
 
 class RemoteShellCommandExecutor:
     def __init__(self, host_info):

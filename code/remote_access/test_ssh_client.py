@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+import sys
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent.resolve()))
+
 from remote_host_info import RemoteHostInfo
 from remote_shell_command_executor import RemoteShellCommandExecutor
 import getpass
-
 
 def test_ssh_client_password():
     password = getpass.getpass()

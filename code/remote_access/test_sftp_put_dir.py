@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+import sys
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent.resolve()))
+
 from remote_host_info import RemoteHostInfo
 from remote_access_helper import RemoteAccessHelper
 import getpass
-
 
 def test_sftp_put_dir():
     password = getpass.getpass()
