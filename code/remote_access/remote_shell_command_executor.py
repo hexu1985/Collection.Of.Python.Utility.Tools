@@ -17,8 +17,8 @@ class RemoteShellCommandExecutor:
         port = self.host_info.port
         username = self.host_info.username
         if self.host_info.use_private_key:
-            self.ssh_client.load_host_keys(self.host_info.private_key_file)
-            self.ssh_client.connect(hostname=hostname, port=port, username=username)
+            private_key = paramiko.RSAKey.from_private_key_file(self.host_info.private_key_file)
+            self.ssh_client.connect(hostname=hostname, port=port, username=username, pkey=private_key)
         else:
             password = self.host_info.password
             self.ssh_client.connect(hostname=hostname, port=port, username=username, password=password)
