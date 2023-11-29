@@ -6,6 +6,7 @@ import time
 import os
 import signal
 import psutil
+import errno
 
 LOGGER = logging.getLogger()
 
@@ -65,7 +66,7 @@ class ShellCommandExecutor:
                 os.kill(pid, signal.SIGKILL)
             self.proc.kill()
             LOGGER.info("cmd: [{}] was killed because timeout".format(self.cmd))
-            return -1
+            return errno.ETIMEDOUT
 
 
 if __name__ == "__main__":
@@ -81,4 +82,5 @@ if __name__ == "__main__":
         cmd.run()
 
     for cmd in cmds:
-        cmd.wait()
+        ret = cmd.wait()
+        print("ret: {}".format(ret))

@@ -3,6 +3,7 @@
 import subprocess
 import logging
 import time
+import errno
 
 LOGGER = logging.getLogger()
 
@@ -42,7 +43,7 @@ class ShellCommandExecutor:
         except subprocess.TimeoutExpired as err:
             self.proc.kill()
             LOGGER.info("cmd: [{}] was killed because timeout".format(self.cmd))
-            return -1
+            return errno.ETIMEDOUT
 
 
 if __name__ == "__main__":
@@ -58,4 +59,5 @@ if __name__ == "__main__":
         cmd.run()
 
     for cmd in cmds:
-        cmd.wait()
+        ret = cmd.wait()
+        print("ret: {}".format(ret))

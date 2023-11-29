@@ -11,6 +11,7 @@ import psutil
 import signal
 import argparse
 import json
+import errno
 
 LOGGER = logging.getLogger()
 
@@ -93,7 +94,7 @@ class ShellCommandExecutor:
             self.logfile.flush()
             self.logfile.close()
             LOGGER.info("cmd: [{}] was killed because timeout, logfile_path: {}".format(self.cmd, self.logfile_path))
-            return -1
+            return errno.ETIMEDOUT
 
 
 
@@ -134,4 +135,5 @@ if __name__ == "__main__":
         cmd.run()
 
     for cmd in cmds:
-        cmd.wait()
+        ret = cmd.wait()
+        print("ret: {}".format(ret))
