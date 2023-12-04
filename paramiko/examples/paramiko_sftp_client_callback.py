@@ -20,11 +20,18 @@ def translate_byte(B):
     else:
         return '{:.2f} TB'.format(B / TB)
 
+#def call_back(curr=100, total=100):
+#    bar_length = 100
+#    percents = '\033[32;1m%s\033[0m' % round(float(curr) * 100 / float(total), 2)
+#    filled = int(bar_length * curr / float(total))
+#    bar = '\033[32;1m%s\033[0m' % '=' * filled + '-' * (bar_length - filled)
+#    print('translating: [{}] {}% already complete: {}, total: {}\r'.format(bar, percents, translate_byte(curr), translate_byte(total)), end='')
+
 def call_back(curr=100, total=100):
     bar_length = 100
-    percents = '\033[32;1m%s\033[0m' % round(float(curr) * 100 / float(total), 2)
+    percents = round(float(curr) * 100 / float(total), 2)
     filled = int(bar_length * curr / float(total))
-    bar = '\033[32;1m%s\033[0m' % '=' * filled + '-' * (bar_length - filled)
+    bar = '=' * filled + '-' * (bar_length - filled)
     print('translating: [{}] {}% already complete: {}, total: {}\r'.format(bar, percents, translate_byte(curr), translate_byte(total)), end='')
 
 hostname="192.168.70.128"
