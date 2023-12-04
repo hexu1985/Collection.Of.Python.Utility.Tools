@@ -29,8 +29,9 @@ class AllChildPidList:
         return self.child_pid_list
 
 class ShellCommandExecutor:
-    def __init__(self, cmd, timeout=3600):
+    def __init__(self, cmd, timeout=3600, output_callback=print):
         self.cmd = cmd
+        self.output_callback = output_callback
         self.timeout = timeout
         self.proc = None
         self.start_time = None
@@ -51,13 +52,15 @@ class ShellCommandExecutor:
             LOGGER.debug('run cmd [{}]'.format(self.cmd))
             os.close(self.pipe_w)
 
-            def print_output(cmd, pipe_r):
+            def print_output(cmd, pipe_r, output_callback):
                 output = os.fdopen(pipe_r)
                 for line in output:
-                    LOGGER.info("cmd: [{}] output: {}".format(cmd, line.rstrip()))
+                    line = line.rstrip()
+                    output_callback(line)
+                    LOGGER.debug("cmd: [{}] output: {}".format(cmd, line))
                 LOGGER.debug("cmd: [{}] output thread exit".format(cmd))
 
-            t = threading.Thread(target=print_output, args=(self.cmd, self.pipe_r), daemon=True)
+            t = threading.Thread(target=print_output, args=(self.cmd, self.pipe_r, self.output_callback), daemon=True)
             t.start()
 
         except subprocess.CalledProcessError as err:

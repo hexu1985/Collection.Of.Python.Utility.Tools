@@ -7,8 +7,9 @@ import threading
 LOGGER = logging.getLogger()
 
 class ShellCommandExecutor:
-    def __init__(self, cmd):
+    def __init__(self, cmd, output_callback=print):
         self.cmd = cmd
+        self.output_callback = output_callback
         self.proc = None
         LOGGER.info("create ShellCommandExecutor(cmd=[{}])".format(self.cmd))
 
@@ -24,12 +25,14 @@ class ShellCommandExecutor:
                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             LOGGER.info('run cmd [{}]'.format(self.cmd))
 
-            def print_output(cmd, output):
+            def print_output(cmd, output, output_callback):
                 for line in output:
-                    LOGGER.info("cmd: [{}] output: {}".format(cmd, line.decode().rstrip()))
+                    line = line.decode().rstrip()
+                    output_callback(line)
+                    LOGGER.info("cmd: [{}] output: {}".format(cmd, line))
                 LOGGER.debug("cmd: [{}] output thread exit".format(cmd))
 
-            t = threading.Thread(target=print_output, args=(self.cmd, self.proc.stdout), daemon=True)
+            t = threading.Thread(target=print_output, args=(self.cmd, self.proc.stdout, self.output_callback), daemon=True)
             t.start()
 
         except subprocess.CalledProcessError as err:
