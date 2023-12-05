@@ -31,14 +31,38 @@ class RemoteHostInfo:
         string_io.seek(0)
         return str(string_io.read())
 
+    def __eq__(self, other):
+        return all((self.hostname == other.hostname,
+                    self.port == other.port,
+                    self.username == other.username,
+                    self.use_private_key == other.use_private_key,
+                    self.private_key_file == other.private_key_file,
+                    self.password == other.password))
+
 def test_remote_host_info():
-    host_info = RemoteHostInfo(
+    remote_host = RemoteHostInfo(
             hostname = '192.168.1.24',
             port = 22,
             username = 'apollo',
             use_private_key = False,
             password = '123456')
-    print('host_info: {}'.format(host_info))
+    print('host_info: {}'.format(remote_host))
+
+def test_remote_host_info_equal():
+    remote_host1 = RemoteHostInfo(
+            hostname = '192.168.1.24',
+            port = 22,
+            username = 'apollo',
+            use_private_key = False,
+            password = '123456')
+    remote_host2 = RemoteHostInfo(
+            hostname = '192.168.1.24',
+            port = 22,
+            username = 'apollo',
+            use_private_key = False,
+            password = '123456')
+    print('remote_host1 == remote_host2 ? {}'.format(remote_host1 == remote_host2))
 
 if __name__ == "__main__":
     test_remote_host_info()
+    test_remote_host_info_equal()
