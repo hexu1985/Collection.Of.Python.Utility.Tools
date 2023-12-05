@@ -94,6 +94,14 @@ class RemoteAccessHelper:
                 sftp.put(localpath=str(local_file), remotepath=str(remote_file), callback=ProgressPrinter(print_progress), confirm=True)
             LOGGER.debug('put(local_file="{}", remote_file="{}")'.format(local_file, remote_file)) 
 
+    def get_file(self, remote_file, local_file, callback=None):
+        sftp = self.ssh_client.get_sftp()
+        return sftp.get(remotepath=remote_file, localpath=local_file, callback=callback)
+
+    def get_file_with_print_progress(self, remote_file, local_file, print_progress=print):
+        sftp = self.ssh_client.get_sftp()
+        return sftp.get(remotepath=remote_file, localpath=local_file, callback=ProgressPrinter(print_progress))
+
     def list_dir(self, remote_dir):
         sftp = self.ssh_client.get_sftp()
         return sftp.listdir(remote_dir)
