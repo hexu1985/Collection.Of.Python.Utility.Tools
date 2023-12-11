@@ -3,6 +3,9 @@
 import paramiko
 import getpass
 import time
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 def translate_byte(B):
     B = float(B)
@@ -58,8 +61,11 @@ print(f"上传{local_path}完成")
 print(f"用时{elapsed}s")
 
 save_path = '/tmp/{}'.format(file_name)
+start = time.time()
 sftp.get(remotepath=remote_path, localpath=save_path, callback=call_back)
+elapsed = time.time() - start
 print()
 print(f'下载{save_path}完成')
+print(f"用时{elapsed}s")
 
 tran.close()
