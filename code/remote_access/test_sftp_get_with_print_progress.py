@@ -10,6 +10,9 @@ from remote_access_helper import RemoteAccessHelper
 import getpass
 import functools
 
+def print_progress(message):
+    print(message, end='')
+
 def test_sftp_put_dir():
     password = getpass.getpass()
     host_info = RemoteHostInfo(
@@ -26,7 +29,7 @@ def test_sftp_put_dir():
     local_file = pathlib.Path('/tmp/a/apt.tar.gz')
     local_dir = local_file.parent
     local_dir.mkdir(parents=True, exist_ok=True)
-    remote_access_helper.get_file_with_print_progress(remote_file=remote_file, local_file=local_file, print_progress=functools.partial(print, end=''))
+    remote_access_helper.get_file_with_print_progress(remote_file=remote_file, local_file=local_file, print_progress=print_progress)
     for f in local_dir.glob("*"):
         print(f)
 

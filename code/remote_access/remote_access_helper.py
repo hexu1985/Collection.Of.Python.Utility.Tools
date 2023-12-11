@@ -72,14 +72,14 @@ class RemoteAccessHelper:
 
     def put_file(self, local_file, remote_file, callback=None, confirm=True):
         sftp = self.ssh_client.get_sftp()
-        return sftp.put(localpath=local_file, remotepath=remote_file, callback=callback, confirm=confirm)
+        return sftp.put(localpath=str(local_file), remotepath=str(remote_file), callback=callback, confirm=confirm)
 
     def put_file_with_print_progress(self, local_file, remote_file, print_progress=print):
         sftp = self.ssh_client.get_sftp()
-        return sftp.put(localpath=local_file, remotepath=remote_file, callback=ProgressPrinter(print_progress), confirm=True)
+        return sftp.put(localpath=str(local_file), remotepath=str(remote_file), callback=ProgressPrinter(print_progress), confirm=True)
 
     def put_dir(self, local_dir, remote_dir, file_pattern="*"):
-        self.put_file_with_print_progress(local_dir, remote_dir, file_pattern, None)
+        self.put_dir_with_print_progress(local_dir, remote_dir, file_pattern, None)
 
     def put_dir_with_print_progress(self, local_dir, remote_dir, file_pattern="*", print_progress=None):
         LOGGER.debug("put_dir(local_dir='{}', remote_dir='{}', file_pattern='{}')".format(local_dir, remote_dir, file_pattern)) 
@@ -96,11 +96,11 @@ class RemoteAccessHelper:
 
     def get_file(self, remote_file, local_file, callback=None):
         sftp = self.ssh_client.get_sftp()
-        return sftp.get(remotepath=remote_file, localpath=local_file, callback=callback)
+        return sftp.get(remotepath=str(remote_file), localpath=str(local_file), callback=callback)
 
     def get_file_with_print_progress(self, remote_file, local_file, print_progress=print):
         sftp = self.ssh_client.get_sftp()
-        return sftp.get(remotepath=remote_file, localpath=local_file, callback=ProgressPrinter(print_progress))
+        return sftp.get(remotepath=str(remote_file), localpath=str(local_file), callback=ProgressPrinter(print_progress))
 
     def list_dir(self, remote_dir):
         sftp = self.ssh_client.get_sftp()
