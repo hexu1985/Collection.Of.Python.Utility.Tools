@@ -7,7 +7,7 @@ import errno
 from remote_access.remote_host_info import RemoteHostInfo
 from remote_access.remote_shell_command_executor import RemoteShellCommandExecutor
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger("remote_access")
 
 class ProgressPrinter:
     def __init__(self, print_progress):
@@ -46,13 +46,14 @@ class RemoteAccessHelper:
         self.remote_host = None
         self.ssh_client = None
 
-    def open(self, remote_host):
+    def open(self, remote_host, compress=False):
+        LOGGER.debug("open(remote_host='{}', compress={})".format(remote_host, compress))
         if self.ssh_client:
             return
 
         self.remote_host = remote_host
         self.ssh_client = RemoteShellCommandExecutor(remote_host)
-        self.ssh_client.connect()
+        self.ssh_client.connect(compress=compress)
 
     def close(self):
         if not self.ssh_client:

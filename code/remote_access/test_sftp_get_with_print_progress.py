@@ -9,11 +9,14 @@ from remote_host_info import RemoteHostInfo
 from remote_access_helper import RemoteAccessHelper
 import getpass
 import functools
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 def print_progress(message):
     print(message, end='')
 
-def test_sftp_put_dir():
+def test_sftp_get_file():
     password = getpass.getpass()
     host_info = RemoteHostInfo(
             hostname = '192.168.70.128',
@@ -23,10 +26,10 @@ def test_sftp_put_dir():
             password = password)
     print('host_info: {}'.format(host_info))
     remote_access_helper = RemoteAccessHelper()
-    remote_access_helper.open(host_info)
+    remote_access_helper.open(host_info, compress=True)
 
-    remote_file = '/tmp/apt.tar.gz'
-    local_file = pathlib.Path('/tmp/a/apt.tar.gz')
+    remote_file = '/tmp/white-rhino-030.20231007-074300_s.00012.1696636515'
+    local_file = pathlib.Path('/tmp/a/white-rhino-030.20231007-074300_s.00012.1696636515')
     local_dir = local_file.parent
     local_dir.mkdir(parents=True, exist_ok=True)
     remote_access_helper.get_file_with_print_progress(remote_file=remote_file, local_file=local_file, print_progress=print_progress)
@@ -34,7 +37,7 @@ def test_sftp_put_dir():
         print(f)
 
 if __name__ == "__main__":
-    test_sftp_put_dir()
+    test_sftp_get_file()
 
 
 

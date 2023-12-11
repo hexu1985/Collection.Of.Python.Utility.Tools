@@ -12,16 +12,18 @@ class RemoteShellCommandExecutor:
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.sftp_client = None
 
-    def connect(self, timeout=None):
+    def connect(self, timeout=None, compress=False):
         hostname = self.host_info.hostname
         port = self.host_info.port
         username = self.host_info.username
         if self.host_info.use_private_key:
             private_key = paramiko.RSAKey.from_private_key_file(self.host_info.private_key_file)
-            self.ssh_client.connect(hostname=hostname, port=port, username=username, pkey=private_key)
+            self.ssh_client.connect(hostname=hostname, port=port, username=username, pkey=private_key, 
+                    timeout=timeout, compress=compress)
         else:
             password = self.host_info.password
-            self.ssh_client.connect(hostname=hostname, port=port, username=username, password=password)
+            self.ssh_client.connect(hostname=hostname, port=port, username=username, password=password,
+                    timeout=timeout, compress=compress)
 
     def close(self):
         if self.sftp_client:
