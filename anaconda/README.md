@@ -12,3 +12,8 @@ conda config --set auto_activate_base false
 
 You can undo this by running `conda init --reverse $SHELL`? [yes|no]
 
+### 退出conda
+
+```
+$ conda deactivate
+```
