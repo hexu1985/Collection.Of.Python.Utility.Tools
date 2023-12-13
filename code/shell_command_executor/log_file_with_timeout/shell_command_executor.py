@@ -51,7 +51,7 @@ class ShellCommandExecutor:
     def run(self):
         try:
             if not self.logfile_path:
-                self.logfile_path = self.LOG_DIR+"/shell_command_executor.log.%s"%datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f')
+                self.logfile_path = self.LOG_DIR+"/shell_command_executor.log.{}.{}".format(datetime.datetime.now().strftime('%Y%m%d-%H%M%S'), os.getpid())
             self.logfile = open(self.logfile_path, 'w')
             self.logfile.write("\ncmd [{}] start at {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')))
             self.logfile.write("\n{}\n".format("*"*20))
