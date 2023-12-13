@@ -54,7 +54,7 @@ class ShellCommandExecutor:
     def run(self):
         try:
             if not self.logfile_path:
-                self.logfile_path = self.LOG_DIR+"/shell_command_executor.log.%s"%datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f')
+                self.logfile_path = self.LOG_DIR+"/shell_command_executor.log.{}.{}".format(datetime.datetime.now().strftime('%Y%m%d-%H%M%S'), os.getpid())
             self.logfile = open(self.logfile_path, 'w')
             self.logfile.write("\ncmd [{}] start at {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')))
             self.logfile.write("\n{}\n".format("*"*20))
@@ -79,7 +79,7 @@ class ShellCommandExecutor:
             ret = self.proc.wait(time_to_wait)
             now = time.time()
             self.logfile.write("\n{}\n".format("*"*20))
-            self.logfile.write("\ncmd [{}] end at {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')))
+            self.logfile.write("\ncmd [{}] end at {}, pid: {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), os.getpid()))
             self.logfile.flush()
             self.logfile.close()
             LOGGER.info("cmd: [{}] complete with ret: {}, logfile_path: {}, escaped time: {}s".format(self.cmd, ret, self.logfile_path, int(now-self.start_time)))
@@ -87,7 +87,10 @@ class ShellCommandExecutor:
         except subprocess.TimeoutExpired as err:
             all_child_pid_list = AllChildPidList(self.proc.pid)
             for pid in all_child_pid_list.get():
-                os.kill(pid, signal.SIGKILL)
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except:
+                    LOGGER.error("kill subprocess {} failed!".format(pid))
             self.proc.kill()
             self.logfile.write("\n{}\n".format("*"*20))
             self.logfile.write("\ncmd [{}] timeout at {}\n".format(self.cmd, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')))

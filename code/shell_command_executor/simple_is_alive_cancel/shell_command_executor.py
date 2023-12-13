@@ -59,7 +59,10 @@ class ShellCommandExecutor:
 
         all_child_pid_list = AllChildPidList(self.proc.pid)
         for pid in all_child_pid_list.get():
-            os.kill(pid, signal.SIGKILL)
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except:
+                LOGGER.error("kill subprocess {} failed!".format(pid))
         self.proc.kill()
 
     def wait(self):
