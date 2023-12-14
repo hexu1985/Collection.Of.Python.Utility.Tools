@@ -7,3 +7,6 @@ print("today datestr: {}".format(datestr))
 sevenday_ago = today - datetime.timedelta(days=7)
 datestr = sevenday_ago.strftime("%Y%m%d")
 print("7day ago datestr: {}".format(datestr))
+
+timestr = today.strftime("%H:%M:%S")
+print("today timestr: {}".format(timestr))
