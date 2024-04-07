@@ -9,7 +9,7 @@ def init_logging_config(log_dir, log_prefix, log_level=logging.INFO, interval=1,
     # logging
     LOG_FILE = os.path.join(
         log_dir,
-        "{}.log.{}".format(log_prefix, datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f'))
+        "{}.log.{}.{}".format(log_prefix, datetime.datetime.now().strftime('%Y%m%d-%H%M%S'), os.getpid())
     )
     LOGGING = {
         "version": 1,
