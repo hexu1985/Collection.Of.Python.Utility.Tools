@@ -71,6 +71,10 @@ class RemoteAccessHelper:
         cmd = 'tar czvf "{}" "{}"'.format(src_dir, dst_file_path)
         return self.exec_command(cmd)
 
+    def remove_file(self, path):
+        sftp = self.ssh_client.get_sftp()
+        return sftp.remove(str(path))
+
     def put_file(self, local_file, remote_file, callback=None, confirm=True):
         sftp = self.ssh_client.get_sftp()
         return sftp.put(localpath=str(local_file), remotepath=str(remote_file), callback=callback, confirm=confirm)
@@ -106,6 +110,15 @@ class RemoteAccessHelper:
     def list_dir(self, remote_dir):
         sftp = self.ssh_client.get_sftp()
         return sftp.listdir(remote_dir)
+
+    def remove_empty_dir(self, remote_dir):
+        sftp = self.ssh_client.get_sftp()
+        return sftp.rmdir(remote_dir)
+
+    def remove_dir(self, remote_dir):
+        for remote_file in self.list_dir(remote_dir):
+            self.remove_file(remote_dir+"/"+remote_file)
+        self.remove_empty_dir(remote_dir)
 
     def is_exists(self, remote_path):
         try:
