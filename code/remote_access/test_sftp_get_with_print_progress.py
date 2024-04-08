@@ -19,7 +19,7 @@ def print_progress(message):
 def test_sftp_get_file():
     password = getpass.getpass()
     host_info = RemoteHostInfo(
-            hostname = '192.168.70.128',
+            hostname = '192.168.100.186',
             port = 22,
             username = 'hexu',
             use_private_key = False,
@@ -28,8 +28,8 @@ def test_sftp_get_file():
     remote_access_helper = RemoteAccessHelper()
     remote_access_helper.open(host_info, compress=True)
 
-    remote_file = '/tmp/white-rhino-030.20231007-074300_s.00012.1696636515'
-    local_file = pathlib.Path('/tmp/a/white-rhino-030.20231007-074300_s.00012.1696636515')
+    remote_file = '/tmp/test.pdf'
+    local_file = pathlib.Path('/tmp/test.pdf')
     local_dir = local_file.parent
     local_dir.mkdir(parents=True, exist_ok=True)
     remote_access_helper.get_file_with_print_progress(remote_file=remote_file, local_file=local_file, print_progress=print_progress)

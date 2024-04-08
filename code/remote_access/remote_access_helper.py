@@ -12,10 +12,15 @@ LOGGER = logging.getLogger("remote_access")
 class ProgressPrinter:
     def __init__(self, print_progress):
         self.print_progress = print_progress
+        self.last_percents = 0.0
 
     def __call__(self, curr=100, total=100):
-        bar_length = 100
+        bar_length = 40
         percents = round(float(curr) * 100 / float(total), 2)
+        if percents > self.last_percents + 5.0:
+            self.last_percents = percents
+        else:
+            return
         filled = int(bar_length * curr / float(total))
         bar = '=' * filled + '-' * (bar_length - filled)
         self.print_progress('\rtranslating: [{}] {}% already complete: {}, total: {}'.format(
@@ -106,6 +111,23 @@ class RemoteAccessHelper:
     def get_file_with_print_progress(self, remote_file, local_file, print_progress=print):
         sftp = self.ssh_client.get_sftp()
         return sftp.get(remotepath=str(remote_file), localpath=str(local_file), callback=ProgressPrinter(print_progress))
+
+    def get_dir(self, remote_dir, local_dir, file_pattern="*"):
+        self.get_dir_with_print_progress(remote_dir, local_dir, file_pattern, None)
+
+    def get_dir_with_print_progress(self, remote_dir, local_dir, file_pattern="*", print_progress=None):
+        LOGGER.debug("get_dir(remote_dir='{}', local_dir='{}', file_pattern='{}')".format(local_dir, remote_dir, file_pattern)) 
+        sftp = self.ssh_client.get_sftp()
+        local_dir_path = pathlib.Path(local_dir)
+        remote_dir_path = pathlib.Path(remote_dir)
+        for file_name in self.list_dir(remote_dir):
+            remote_file = remote_dir_path/file_name
+            local_file = local_dir_path/file_name
+            if print_progress == None:
+                sftp.get(remotepath=str(remote_file), localpath=str(local_file))
+            else:
+                sftp.get(remotepath=str(remote_file), localpath=str(local_file), callback=ProgressPrinter(print_progress))
+            LOGGER.debug('get(remote_file="{}", local_file="{}")'.format(local_file, remote_file)) 
 
     def list_dir(self, remote_dir):
         sftp = self.ssh_client.get_sftp()
