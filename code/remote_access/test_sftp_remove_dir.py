@@ -3,11 +3,15 @@
 
 import sys
 import pathlib
+import logging
+import traceback
 sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent.resolve()))
 
 from remote_host_info import RemoteHostInfo
 from remote_access_helper import RemoteAccessHelper
 import getpass
+
+logger = logging.getLogger()
 
 def test_sftp_remove_dir():
     password = getpass.getpass()
@@ -22,7 +26,10 @@ def test_sftp_remove_dir():
     remote_access_helper.open(host_info)
 
     remote_dir = '/tmp/test'
-    remote_access_helper.remove_dir(remote_dir)
+    try:
+        remote_access_helper.remove_dir(remote_dir)
+    except:
+        logger.error(traceback.format_exc(limit=1))
 
 if __name__ == "__main__":
     test_sftp_remove_dir()
