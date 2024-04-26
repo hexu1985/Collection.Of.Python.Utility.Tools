@@ -5,7 +5,7 @@ import getpass
 import pathlib
 import errno
 
-hostname="192.168.100.180"
+hostname="192.168.70.116"
 port=22
 
 tran = paramiko.Transport((hostname, port))
@@ -14,8 +14,8 @@ tran.connect(username='hexu', password=password)
 
 sftp = paramiko.SFTPClient.from_transport(tran)
 
-local_path = pathlib.Path(__file__)
-remote_path = pathlib.Path('/tmp')/local_path.name
+local_path = "/tmp/white-rhino-031.20240303.small_bag.1709437214-1709437264.bag"
+remote_path = "/tmp/white-rhino-031.20240303.small_bag.1709437214-1709437264.bag"
 
 stat = None
 try:
@@ -31,7 +31,7 @@ seek_pos = 0
 if stat:
     seek_pos = stat.st_size
 
-f_local = open(local_path)
+f_local = open(local_path, "rb")
 f_local.seek(seek_pos)
 f_remote = sftp.open(str(remote_path), "a")
 tmp_buffer = f_local.read(100000)
@@ -42,9 +42,5 @@ f_remote.close()
 f_local.close()
 
 print(f"上传{local_path}完成")
-
-save_path = remote_path
-sftp.get(remotepath=str(remote_path), localpath=str(save_path))
-print(f'下载{save_path}完成')
 
 tran.close()
