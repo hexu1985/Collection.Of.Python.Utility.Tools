@@ -12,15 +12,14 @@ LOGGER = logging.getLogger("remote_access")
 class ProgressPrinter:
     def __init__(self, print_progress):
         self.print_progress = print_progress
-        self.last_percents = 0.0
+        self.callback_count = 0
 
     def __call__(self, curr=100, total=100):
+        self.callback_count += 1
+        if self.callback_count % 10:
+            return;
         bar_length = 40
         percents = round(float(curr) * 100 / float(total), 2)
-        if percents > self.last_percents + 5.0 or percents >= 99.5:
-            self.last_percents = percents
-        else:
-            return
         filled = int(bar_length * curr / float(total))
         bar = '=' * filled + '-' * (bar_length - filled)
         self.print_progress('\rtranslating: [{}] {}% already complete: {}, total: {}'.format(
