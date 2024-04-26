@@ -17,7 +17,7 @@ class ProgressPrinter:
     def __call__(self, curr=100, total=100):
         bar_length = 40
         percents = round(float(curr) * 100 / float(total), 2)
-        if percents > self.last_percents + 5.0:
+        if percents > self.last_percents + 5.0 or percents >= 99.5:
             self.last_percents = percents
         else:
             return
