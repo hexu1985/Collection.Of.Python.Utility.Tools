@@ -5,7 +5,7 @@ import pathlib
 import logging
 import errno
 from remote_access.remote_host_info import RemoteHostInfo
-from remote_access.remote_shell_command_executor import RemoteShellCommandExecutor
+from remote_access.remote_shell_executor import RemoteShellExecutor
 
 LOGGER = logging.getLogger("remote_access")
 
@@ -56,7 +56,7 @@ class RemoteAccessHelper:
             return
 
         self.remote_host = remote_host
-        self.ssh_client = RemoteShellCommandExecutor(remote_host)
+        self.ssh_client = RemoteShellExecutor(remote_host)
         self.ssh_client.connect(compress=compress)
 
     def close(self):

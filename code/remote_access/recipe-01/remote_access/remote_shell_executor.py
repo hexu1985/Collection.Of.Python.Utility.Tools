@@ -5,7 +5,7 @@ import io
 import paramiko
 from remote_access.remote_host_info import RemoteHostInfo
 
-class RemoteShellCommandExecutor:
+class RemoteShellExecutor:
     def __init__(self, host_info):
         self.host_info = host_info
         self.ssh_client = paramiko.SSHClient()
@@ -46,7 +46,7 @@ class RemoteShellCommandExecutor:
 
         def __str__(self):
             string_io = io.StringIO()
-            string_io.write("RemoteShellCommandExecutor.ExecuteException:\n")
+            string_io.write("RemoteShellExecutor.ExecuteException:\n")
             string_io.write("host_info: {}\n".format(self.host_info))
             string_io.write("command: {}\n".format(self.command))
             string_io.write("error_msg: \n{}\n".format(self.error_msg))
@@ -57,7 +57,7 @@ class RemoteShellCommandExecutor:
         stdin, stdout, stderr = self.ssh_client.exec_command(command=command, timeout=timeout)
         stderr_info = stderr.read().decode('utf8')
         if stderr_info:
-            raise RemoteShellCommandExecutor.ExecuteException(self.host_info, command, stderr_info)
+            raise RemoteShellExecutor.ExecuteException(self.host_info, command, stderr_info)
         stdout_info = stdout.read().decode('utf8')
         return stdout_info
 
