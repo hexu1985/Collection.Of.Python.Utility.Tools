@@ -4,6 +4,7 @@
 import pathlib
 import logging
 import paramiko
+from remote_access.remote_host_info import RemoteHostInfo
 
 LOGGER = logging.getLogger("remote_access")
 
@@ -116,3 +117,18 @@ class RemoteFileTransporter:
             else:
                 raise
 
+
+def create_remote_file_transporter(host_info):
+    hostname = host_info.hostname
+    port = host_info.port
+    username = host_info.username
+
+    tran = paramiko.Transport((hostname, port))
+    if self.host_info.use_private_key:
+        private_key = paramiko.RSAKey.from_private_key_file(host_info.private_key_file)
+        tran.connect(username=username, pkey=private_key)
+    else:
+        password = host_info.password
+        tran.connect(username=username, password=password)
+    sftp = paramiko.SFTPClient.from_transport(tran)
+    return RemoteFileTransporter(sftp)
