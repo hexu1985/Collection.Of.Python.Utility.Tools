@@ -23,7 +23,7 @@ def test_ssh_client_raise_exception(remote_executor):
 if __name__ == "__main__":
     password = getpass.getpass()
     host_info = RemoteHostInfo(
-            hostname = '192.168.70.128',
+            hostname = '192.168.70.116',
             port = 22,
             username = 'hexu',
             use_private_key = False,

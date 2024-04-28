@@ -6,6 +6,7 @@ import logging
 import errno
 from remote_access.remote_host_info import RemoteHostInfo
 from remote_access.remote_shell_executor import RemoteShellExecutor
+from remote_access.remote_access_helper_config import *
 
 LOGGER = logging.getLogger("remote_access")
 
@@ -57,7 +58,7 @@ class RemoteAccessHelper:
 
         self.remote_host = remote_host
         self.ssh_client = RemoteShellExecutor(remote_host)
-        self.ssh_client.connect(compress=compress)
+        self.ssh_client.connect(compress=compress, timeout=SSH_CLIENT_CONNECT_TIMEDOUT_SECS)
 
     def close(self):
         if not self.ssh_client:
