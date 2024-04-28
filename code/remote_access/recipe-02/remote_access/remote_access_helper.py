@@ -6,45 +6,10 @@ import logging
 import errno
 from remote_access.remote_host_info import RemoteHostInfo
 from remote_access.remote_shell_executor import RemoteShellExecutor
+from remote_access.remote_file_transporter import RemoteFileTransporter
 from remote_access.remote_access_helper_config import *
 
 LOGGER = logging.getLogger("remote_access")
-
-class ProgressPrinter:
-    def __init__(self, print_progress):
-        self.print_progress = print_progress
-        self.callback_count = 0
-
-    def __call__(self, curr=100, total=100):
-        self.callback_count += 1
-        if self.callback_count % 10:
-            return;
-        bar_length = 40
-        percents = round(float(curr) * 100 / float(total), 2)
-        filled = int(bar_length * curr / float(total))
-        bar = '=' * filled + '-' * (bar_length - filled)
-        self.print_progress('\rtranslating: [{}] {}% already complete: {}, total: {}'.format(
-            bar, percents, self.translate_byte(curr), self.translate_byte(total)))
-
-        if curr >= total:
-            self.print_progress('\n')
-
-    def translate_byte(self, B):
-        B = float(B)
-        KB = float(1024)
-        MB = float(KB ** 2)
-        GB = float(MB ** 2)
-        TB = float(GB ** 2)
-        if B < KB:
-            return '{} {}'.format(B, 'bytes' if B > 1 else byte)
-        elif KB < B < MB:
-            return '{:.2f} KB'.format(B / KB)
-        elif MB < B < GB:
-            return '{:.2f} MB'.format(B / MB)
-        elif GB < B < TB:
-            return '{:.2f} GB'.format(B / GB)
-        else:
-            return '{:.2f} TB'.format(B / TB)
 
 class RemoteAccessHelper:
     def __init__(self):
@@ -80,78 +45,37 @@ class RemoteAccessHelper:
         sftp = self.ssh_client.get_sftp()
         return sftp.remove(str(path))
 
-    def put_file(self, local_file, remote_file, callback=None, confirm=True):
-        sftp = self.ssh_client.get_sftp()
-        return sftp.put(localpath=str(local_file), remotepath=str(remote_file), callback=callback, confirm=confirm)
+    def put_file(self, local_file, remote_file, print_progress=None):
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), print_progress=print_progress)
+        return sftp_client.put_file(local_file=str(local_file), remote_file=str(remote_file))
 
-    def put_file_with_print_progress(self, local_file, remote_file, print_progress=print):
-        sftp = self.ssh_client.get_sftp()
-        return sftp.put(localpath=str(local_file), remotepath=str(remote_file), callback=ProgressPrinter(print_progress), confirm=True)
+    def put_dir(self, local_dir, remote_dir, file_pattern="*", print_progress=None):
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), print_progress=print_progress)
+        return sftp_client.put_dir(local_dir=str(local_dir), remote_dir=str(remote_dir), file_pattern=file_pattern)
 
-    def put_dir(self, local_dir, remote_dir, file_pattern="*"):
-        self.put_dir_with_print_progress(local_dir, remote_dir, file_pattern, None)
+    def get_file(self, remote_file, local_file, print_progress=None):
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), print_progress=print_progress)
+        return sftp_client.get_file(remote_file=str(remote_file), local_file=str(local_file))
 
-    def put_dir_with_print_progress(self, local_dir, remote_dir, file_pattern="*", print_progress=None):
-        LOGGER.debug("put_dir(local_dir='{}', remote_dir='{}', file_pattern='{}')".format(local_dir, remote_dir, file_pattern)) 
-        sftp = self.ssh_client.get_sftp()
-        local_dir_path = pathlib.Path(local_dir)
-        remote_dir_path = pathlib.Path(remote_dir)
-        for local_file in local_dir_path.glob(file_pattern):
-            remote_file = remote_dir_path/local_file.name 
-            if print_progress == None:
-                sftp.put(localpath=str(local_file), remotepath=str(remote_file))
-            else:
-                sftp.put(localpath=str(local_file), remotepath=str(remote_file), callback=ProgressPrinter(print_progress), confirm=True)
-            LOGGER.debug('put(local_file="{}", remote_file="{}")'.format(local_file, remote_file)) 
-
-    def get_file(self, remote_file, local_file, callback=None):
-        sftp = self.ssh_client.get_sftp()
-        return sftp.get(remotepath=str(remote_file), localpath=str(local_file), callback=callback)
-
-    def get_file_with_print_progress(self, remote_file, local_file, print_progress=print):
-        sftp = self.ssh_client.get_sftp()
-        return sftp.get(remotepath=str(remote_file), localpath=str(local_file), callback=ProgressPrinter(print_progress))
-
-    def get_dir(self, remote_dir, local_dir, file_pattern="*"):
-        self.get_dir_with_print_progress(remote_dir, local_dir, file_pattern, None)
-
-    def get_dir_with_print_progress(self, remote_dir, local_dir, file_pattern="*", print_progress=None):
-        LOGGER.debug("get_dir(remote_dir='{}', local_dir='{}', file_pattern='{}')".format(local_dir, remote_dir, file_pattern)) 
-        sftp = self.ssh_client.get_sftp()
-        local_dir_path = pathlib.Path(local_dir)
-        remote_dir_path = pathlib.Path(remote_dir)
-        for file_name in self.list_dir(remote_dir):
-            remote_file = remote_dir_path/file_name
-            local_file = local_dir_path/file_name
-            if print_progress == None:
-                sftp.get(remotepath=str(remote_file), localpath=str(local_file))
-            else:
-                sftp.get(remotepath=str(remote_file), localpath=str(local_file), callback=ProgressPrinter(print_progress))
-            LOGGER.debug('get(remote_file="{}", local_file="{}")'.format(local_file, remote_file)) 
+    def get_dir(self, remote_dir, local_dir, file_pattern="*", print_progress=None):
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), print_progress=print_progress)
+        return sftp_client.get_dir(remote_dir=str(remote_dir), local_dir=str(local_dir), file_pattern=file_pattern)
 
     def list_dir(self, remote_dir):
-        sftp = self.ssh_client.get_sftp()
-        return sftp.listdir(remote_dir)
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
+        return sftp_client.list_dir(str(remote_dir))
 
     def remove_empty_dir(self, remote_dir):
-        sftp = self.ssh_client.get_sftp()
-        return sftp.rmdir(remote_dir)
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
+        return sftp_client.remove_empty_dir(str(remote_dir))
 
     def remove_dir(self, remote_dir):
-        for remote_file in self.list_dir(remote_dir):
-            self.remove_file(remote_dir+"/"+remote_file)
-        self.remove_empty_dir(remote_dir)
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
+        return sftp_client.remote_dir(str(remote_dir))
 
     def is_exists(self, remote_path):
-        try:
-            sftp = self.ssh_client.get_sftp()
-            sftp.stat(remote_path)
-            return True
-        except IOError as e:
-            if e.errno == errno.ENOENT:
-                return False
-            else:
-                raise
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
+        return sftp_client.is_exists(str(remote_path))
 
     def exec_command(self, command, timeout=None):
         return self.ssh_client.exec_command(command=command, timeout=timeout)

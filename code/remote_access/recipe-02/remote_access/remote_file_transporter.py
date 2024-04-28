@@ -15,13 +15,14 @@ class ProgressPrinter:
 
     def __call__(self, curr=100, total=100):
         self.callback_count += 1
-        if self.callback_count % 10:
-            return;
-        bar_length = 40
         percents = float(curr) * 100 / float(total)
+        if self.callback_count % 100 and 0.1 < percents < 99.9:
+            return;
+
+        bar_length = 40
         filled = int(bar_length * curr / float(total))
         bar = '=' * filled + '-' * (bar_length - filled)
-        self.print_progress('\rtranslating: [{}] {.2f}% already complete: {}, total: {}'.format(
+        self.print_progress('\rtranslating: [{}] {:.2f}% already complete: {}, total: {}'.format(
             bar, percents, self.translate_byte(curr), self.translate_byte(total)))
 
         if curr >= total:
@@ -59,8 +60,8 @@ class RemoteFileTransporter:
         else:
             return self._put_file(local_file=local_file, remote_file=remote_file)
 
-    def _put_file(local_file, remote_file):
-        return self.sftp.put(localpath=local_file, remotepath=remote_file, callback=self.callback)
+    def _put_file(self, local_file, remote_file):
+        return self.sftp.put(localpath=local_file, remotepath=remote_file, callback=self.call_back)
 
     def _put_file_with_breakpoint_resume(self, local_file, remote_file):
         pass
@@ -76,12 +77,12 @@ class RemoteFileTransporter:
 
     def get_file(self, remote_file, local_file):
         if self.breakpoint_resume:
-            self._get_file_with_breakpoint_resume(self, remote_file=remote_file, local_file=local_file)
+            self._get_file_with_breakpoint_resume(remote_file=remote_file, local_file=local_file)
         else:
-            self._get_file(self, remote_file=remote_file, local_file=local_file)
+            self._get_file(remote_file=remote_file, local_file=local_file)
 
     def _get_file(self, remote_file, local_file):
-        return self.sftp.get(remotepath=remote_file, localpath=local_file, callback=self.callback)
+        return self.sftp.get(remotepath=remote_file, localpath=local_file, callback=self.call_back)
 
     def _get_file_with_breakpoint_resume(self, remote_file, local_file):
         pass
@@ -118,17 +119,17 @@ class RemoteFileTransporter:
                 raise
 
 
-def create_remote_file_transporter(host_info):
+def create_remote_file_transporter(host_info, print_progress=None, breakpoint_resume=False):
     hostname = host_info.hostname
     port = host_info.port
     username = host_info.username
 
     tran = paramiko.Transport((hostname, port))
-    if self.host_info.use_private_key:
+    if host_info.use_private_key:
         private_key = paramiko.RSAKey.from_private_key_file(host_info.private_key_file)
         tran.connect(username=username, pkey=private_key)
     else:
         password = host_info.password
         tran.connect(username=username, password=password)
     sftp = paramiko.SFTPClient.from_transport(tran)
-    return RemoteFileTransporter(sftp)
+    return RemoteFileTransporter(sftp, print_progress=print_progress, breakpoint_resume=breakpoint_resume)
