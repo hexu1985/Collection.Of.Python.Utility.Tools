@@ -5,6 +5,8 @@ import pathlib
 import logging
 import paramiko
 import errno
+import fnmatch
+import stat
 from remote_access.remote_host_info import RemoteHostInfo
 
 LOGGER = logging.getLogger("remote_access")
@@ -73,11 +75,14 @@ class RemoteFileTransporter:
         else:
             self._put_file(local_file=local_file, remote_file=remote_file)
 
-    def put_dir(self, local_dir, remote_dir, file_pattern="*", recursive=False):
+    def put_dir(self, local_dir, remote_dir, file_pattern="*"):
         LOGGER.debug("put_dir(local_dir='{}', remote_dir='{}', file_pattern='{}')".format(local_dir, remote_dir, file_pattern)) 
         local_dir_path = pathlib.Path(local_dir)
         remote_dir_path = pathlib.Path(remote_dir)
         for local_file_path in local_dir_path.glob(file_pattern):
+            if not local_file_path.is_file():
+                continue
+
             remote_file_path = remote_dir_path/local_file_path.name 
             self.put_file(local_file=str(local_file_path), remote_file=str(remote_file_path))
             LOGGER.debug('put(local_file="{}", remote_file="{}")'.format(local_file_path, remote_file_path)) 
@@ -100,11 +105,18 @@ class RemoteFileTransporter:
         else:
             self._get_file(remote_file=remote_file, local_file=local_file)
 
-    def get_dir(self, remote_dir, local_dir, file_pattern="*", recursive=False):
+    def get_dir(self, remote_dir, local_dir, file_pattern="*"):
         LOGGER.debug("get_dir(remote_dir='{}', local_dir='{}', file_pattern='{}')".format(local_dir, remote_dir, file_pattern)) 
         local_dir_path = pathlib.Path(local_dir)
         remote_dir_path = pathlib.Path(remote_dir)
-        for file_name in self.list_dir(remote_dir):
+        for item in self.sftp.listdir_attr(remote_dir):
+            if not stat.S_ISREG(item.st_mode):
+                continue
+
+            if not fnmatch.fnmatch(item.filename, file_pattern):
+                continue
+
+            file_name = item.filename
             remote_file_path = remote_dir_path/file_name
             local_file_path = local_dir_path/file_name
             self.get_file(remote_file=str(remote_file_path), local_file=str(local_file_path))

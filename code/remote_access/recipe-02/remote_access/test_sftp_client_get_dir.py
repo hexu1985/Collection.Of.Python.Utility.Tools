@@ -12,7 +12,7 @@ import getpass
 def print_progress(message):
     print(message, end='')
 
-def test_sftp_client_password():
+def test_sftp_client_get_dir():
     password = getpass.getpass()
     host_info = RemoteHostInfo(
             hostname = '192.168.70.116',
@@ -23,22 +23,15 @@ def test_sftp_client_password():
     print('host_info: {}'.format(host_info))
     remote_transporter = create_remote_file_transporter(host_info, print_progress=print_progress, breakpoint_resume=True)
 
-    local_file="/home/hexu/white-rhino-031.20240303.small_bag.1709437214-1709437264.bag"
-    remote_file="/tmp/white-rhino-031.20240303.small_bag.1709437214-1709437264.bag"
-    save_file="/tmp/white-rhino-031.20240303.small_bag.1709437214-1709437264.bag"
+    remote_dir="/tmp"
+    local_dir="/tmp/test/a"
 
     tic = time.time()
-    remote_transporter.put_file(local_file=local_file, remote_file=remote_file)
+    remote_transporter.get_dir(remote_dir=remote_dir, local_dir=local_dir, file_pattern="*.md")
     toc = time.time()
-    print(f"上传{local_file}完成")
-    print("use time:", toc-tic, "sec")
-
-    tic = time.time()
-    remote_transporter.get_file(remote_file=remote_file, local_file=save_file)
-    toc = time.time()
-    print(f'下载{save_file}完成')
+    print(f'下载{remote_dir}完成')
     print("use time:", toc-tic, "sec")
 
 if __name__ == "__main__":
-    test_sftp_client_password()
+    test_sftp_client_get_dir()
 
