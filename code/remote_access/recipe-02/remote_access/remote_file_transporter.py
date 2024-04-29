@@ -4,6 +4,7 @@
 import pathlib
 import logging
 import paramiko
+import errno
 from remote_access.remote_host_info import RemoteHostInfo
 
 LOGGER = logging.getLogger("remote_access")
@@ -56,15 +57,21 @@ class RemoteFileTransporter:
 
     def put_file(self, local_file, remote_file):
         if self.breakpoint_resume:
-            return self._put_file_with_breakpoint_resume(local_file=local_file, remote_file=remote_file)
+            self._put_file_with_breakpoint_resume(local_file=local_file, remote_file=remote_file)
         else:
-            return self._put_file(local_file=local_file, remote_file=remote_file)
+            self._put_file(local_file=local_file, remote_file=remote_file)
 
     def _put_file(self, local_file, remote_file):
-        return self.sftp.put(localpath=local_file, remotepath=remote_file, callback=self.call_back)
+        self.sftp.put(localpath=local_file, remotepath=remote_file, callback=self.call_back)
 
     def _put_file_with_breakpoint_resume(self, local_file, remote_file):
-        pass
+        remote_file_size = self.get_file_size(remote_file)
+        local_file_size = self._get_local_file_size(local_file)
+        if remote_file_size == local_file_size:
+            if self.call_back:
+                self.call_back(remote_file_size, local_file_size)
+        else:
+            self._put_file(local_file=local_file, remote_file=remote_file)
 
     def put_dir(self, local_dir, remote_dir, file_pattern="*", recursive=False):
         LOGGER.debug("put_dir(local_dir='{}', remote_dir='{}', file_pattern='{}')".format(local_dir, remote_dir, file_pattern)) 
@@ -82,10 +89,16 @@ class RemoteFileTransporter:
             self._get_file(remote_file=remote_file, local_file=local_file)
 
     def _get_file(self, remote_file, local_file):
-        return self.sftp.get(remotepath=remote_file, localpath=local_file, callback=self.call_back)
+        self.sftp.get(remotepath=remote_file, localpath=local_file, callback=self.call_back)
 
     def _get_file_with_breakpoint_resume(self, remote_file, local_file):
-        pass
+        remote_file_size = self.get_file_size(remote_file)
+        local_file_size = self._get_local_file_size(local_file)
+        if remote_file_size == local_file_size:
+            if self.call_back:
+                self.call_back(local_file_size, remote_file_size)
+        else:
+            self._get_file(remote_file=remote_file, local_file=local_file)
 
     def get_dir(self, remote_dir, local_dir, file_pattern="*", recursive=False):
         LOGGER.debug("get_dir(remote_dir='{}', local_dir='{}', file_pattern='{}')".format(local_dir, remote_dir, file_pattern)) 
@@ -101,7 +114,7 @@ class RemoteFileTransporter:
         return self.sftp.listdir(remote_dir)
 
     def remove_empty_dir(self, remote_dir):
-        return self.sftp.rmdir(remote_dir)
+        self.sftp.rmdir(remote_dir)
 
     def remove_dir(self, remote_dir, recursive=False):
         for remote_file in self.list_dir(remote_dir):
@@ -118,8 +131,26 @@ class RemoteFileTransporter:
             else:
                 raise
 
+    def get_file_size(self, remote_path):
+        try:
+            stat = self.sftp.stat(remote_path)
+            return stat.st_size
+        except IOError as e:
+            if e.errno == errno.ENOENT:
+                return 0
+            else:
+                raise
 
-def create_remote_file_transporter(host_info, print_progress=None, breakpoint_resume=False):
+    def _get_local_file_size(self, local_path):
+        try:
+            f = pathlib.Path(local_path)
+            stat_info = f.lstat()
+            return stat_info.st_size
+        except:
+            return 0
+
+
+def create_remote_file_transporter(host_info, print_progress=None, breakpoint_resume=False, compress=False):
     hostname = host_info.hostname
     port = host_info.port
     username = host_info.username
@@ -127,7 +158,7 @@ def create_remote_file_transporter(host_info, print_progress=None, breakpoint_re
     tran = paramiko.Transport((hostname, port))
     if host_info.use_private_key:
         private_key = paramiko.RSAKey.from_private_key_file(host_info.private_key_file)
-        tran.connect(username=username, pkey=private_key)
+        tran.connect(username=username, pkey=private_key, compress=compress)
     else:
         password = host_info.password
         tran.connect(username=username, password=password)
