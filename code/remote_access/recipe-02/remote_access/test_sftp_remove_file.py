@@ -12,7 +12,7 @@ import getpass
 def test_sftp_remove_file():
     password = getpass.getpass()
     host_info = RemoteHostInfo(
-            hostname = '192.168.100.186',
+            hostname = '192.168.70.116',
             port = 22,
             username = 'hexu',
             use_private_key = False,

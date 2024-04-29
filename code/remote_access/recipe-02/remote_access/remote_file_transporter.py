@@ -17,6 +17,9 @@ class ProgressPrinter:
         self.callback_count = 0
 
     def __call__(self, curr=100, total=100):
+        if curr <= 0 or total <= 0:
+            return;
+
         self.callback_count += 1
         percents = float(curr) * 100 / float(total)
         if self.callback_count % 100 and 0.1 < percents < 99.9:
@@ -132,6 +135,9 @@ class RemoteFileTransporter:
         for remote_file in self.list_dir(remote_dir):
             self.remove_file(remote_dir+"/"+remote_file)
         self.remove_empty_dir(remote_dir)
+
+    def remove_file(self, remote_path):
+        self.sftp.remove(remote_path)
 
     def is_exists(self, remote_path):
         try:

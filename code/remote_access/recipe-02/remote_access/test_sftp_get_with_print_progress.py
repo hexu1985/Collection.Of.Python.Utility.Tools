@@ -33,8 +33,7 @@ def test_sftp_get_file():
     local_dir = pathlib.Path(local_file).parent
     local_dir.mkdir(parents=True, exist_ok=True)
     remote_access_helper.get_file(remote_file=remote_file, local_file=local_file, print_progress=print_progress)
-    for f in local_dir.glob("*"):
-        print(f)
+    print(f'下载{local_file}完成')
 
 if __name__ == "__main__":
     test_sftp_get_file()

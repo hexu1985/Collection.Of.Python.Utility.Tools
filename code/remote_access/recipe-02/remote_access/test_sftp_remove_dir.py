@@ -16,7 +16,7 @@ logger = logging.getLogger()
 def test_sftp_remove_dir():
     password = getpass.getpass()
     host_info = RemoteHostInfo(
-            hostname = '192.168.100.186',
+            hostname = '192.168.70.116',
             port = 22,
             username = 'hexu',
             use_private_key = False,

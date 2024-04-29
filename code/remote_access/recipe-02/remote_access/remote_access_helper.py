@@ -42,23 +42,27 @@ class RemoteAccessHelper:
         return self.exec_command(cmd)
 
     def remove_file(self, path):
-        sftp = self.ssh_client.get_sftp()
-        return sftp.remove(str(path))
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
+        return sftp_client.remove_file(str(path))
 
-    def put_file(self, local_file, remote_file, print_progress=None):
-        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), print_progress=print_progress)
+    def put_file(self, local_file, remote_file, print_progress=None, breakpoint_resume=True):
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), 
+                print_progress=print_progress, breakpoint_resume=breakpoint_resume)
         return sftp_client.put_file(local_file=str(local_file), remote_file=str(remote_file))
 
-    def put_dir(self, local_dir, remote_dir, file_pattern="*", print_progress=None):
-        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), print_progress=print_progress)
+    def put_dir(self, local_dir, remote_dir, file_pattern="*", print_progress=None, breakpoint_resume=True):
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), 
+                print_progress=print_progress, breakpoint_resume=breakpoint_resume)
         return sftp_client.put_dir(local_dir=str(local_dir), remote_dir=str(remote_dir), file_pattern=file_pattern)
 
-    def get_file(self, remote_file, local_file, print_progress=None):
-        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), print_progress=print_progress)
+    def get_file(self, remote_file, local_file, print_progress=None, breakpoint_resume=True):
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), 
+                print_progress=print_progress, breakpoint_resume=breakpoint_resume)
         return sftp_client.get_file(remote_file=str(remote_file), local_file=str(local_file))
 
-    def get_dir(self, remote_dir, local_dir, file_pattern="*", print_progress=None):
-        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), print_progress=print_progress)
+    def get_dir(self, remote_dir, local_dir, file_pattern="*", print_progress=None, breakpoint_resume=True):
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp(), 
+                print_progress=print_progress, breakpoint_resume=breakpoint_resume)
         return sftp_client.get_dir(remote_dir=str(remote_dir), local_dir=str(local_dir), file_pattern=file_pattern)
 
     def list_dir(self, remote_dir):
@@ -71,7 +75,7 @@ class RemoteAccessHelper:
 
     def remove_dir(self, remote_dir):
         sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
-        return sftp_client.remote_dir(str(remote_dir))
+        return sftp_client.remove_dir(str(remote_dir))
 
     def is_exists(self, remote_path):
         sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
