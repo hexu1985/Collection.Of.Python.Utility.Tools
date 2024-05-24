@@ -86,6 +86,7 @@ $ sudo vim /etc/modprobe.d/blacklist.conf
 
 ```
 blacklist nouveau
+options nouveau modeset=0
 ```
 
 保存并退出：
@@ -268,20 +269,34 @@ Build cuda_11.1.TC455_06.29190527_0
 
 5. 进行cudnn的安装
 
-进入到cudnn下载的安装路径下，命令行输入以下命令进行解压操作：
+安装 cuDNN为与安装 CUDA 类似，不过需要注册 Nvidia 账号，这部分可能会卡顿，解决办法还是将网站后缀改成 .cn ，或科学上网。
 
-```
-$ tar -xzvf cudnn-10.1-linux-x64-v8.0.5.39.tgz //这里cudnn-10.1-linux-x64-v8.0.5.39.tgz是我们下载的cudnn的压缩包
+官网：[cuDNN官方下载](https://link.zhihu.com/?target=https%3A//developer.nvidia.com/rdp/cudnn-download)
+
+国内：[cuDNN官方下载](https://link.zhihu.com/?target=https%3A//developer.nvidia.cn/rdp/cudnn-download)
+
+官网历史版本：[cuDNN历史版本](https://link.zhihu.com/?target=https%3A//developer.nvidia.com/rdp/cudnn-archive)
+
+国内历史版本：[cuDNN历史版本](https://link.zhihu.com/?target=https%3A//developer.nvidia.cn/rdp/cudnn-archive)
+
+选择自己对应的系统以及 CUDA 版本下载即可，笔者是 Ubuntu18.04 + CUDA11.1
+
+```shell
+$ sudo dpkg -i libcudnn8_8.0.4.30-1+cuda11.1_amd64.deb
+$ sudo dpkg -i libcudnn8-dev_8.0.4.30-1+cuda11.1_amd64.deb
+$ sudo dpkg -i libcudnn8-samples_8.0.4.30-1+cuda11.1_amd64.deb
 ```
 
-随后在当前路径的命令行终端输入以下三条命令进行cudnn的安装：
+测试安装是否成功：
 
+```shell
+$ cp -r /usr/src/cudnn_samples_v8/ $HOME
+$ cd  $HOME/cudnn_samples_v8/mnistCUDNN
+$ make clean && make
+$ ./mnistCUDNN
+# 测试通过
+Test passed!
 ```
-$ sudo cp -r cuda/include/*    /usr/local/cuda/include/
-$ sudo cp -r cuda/lib64/libcudnn*    /usr/local/cuda/lib64/
-```
-
-至此cuda与cudnn全部安装成功。
 
 ---
 
@@ -289,22 +304,15 @@ $ sudo cp -r cuda/lib64/libcudnn*    /usr/local/cuda/lib64/
 
 1.安装pyCUDA之前必须安装CUDA
 
-2.安装pyCUDA
+2.安装anaconda
+
+3.anaconda上安装pyCUDA：
 
 只需要执行：
 
 ```
-$ python -m pip install -i http://pypi.douban.com/simple --trusted-host pypi.douban.com  pycuda
-$ python3 -m pip install -i http://pypi.douban.com/simple --trusted-host pypi.douban.com  pycuda
+$ conda install -c conda-forge pycuda
 ```
-
-但安装的pycuda版本可能比较旧。
-
-如果需要安装指定版本的pycuda可以去github上下载压缩包([pycuda release download](https://github.com/inducer/pycuda/tags))，
-安装步骤参考[Installing PyCUDA on Linux](https://wiki.tiker.net/PyCuda/Installation/Linux/)。
-
-python2.7和python3.6的版本都太老了，自己编译pycuda或者跑pycuda的示例代码，可能会有各种坑，这里就不填了，
-建议将Ubuntu的系统升级，然后使用系统自带的高版本的Python3去编译安装pycuda。
 
 ---
 
