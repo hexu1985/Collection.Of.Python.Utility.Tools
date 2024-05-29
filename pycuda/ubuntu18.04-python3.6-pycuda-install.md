@@ -269,29 +269,23 @@ Build cuda_11.1.TC455_06.29190527_0
 
 5. 进行cudnn的安装
 
-安装 cuDNN为与安装 CUDA 类似，不过需要注册 Nvidia 账号，这部分可能会卡顿，解决办法还是将网站后缀改成 .cn ，或科学上网。
+安装 cuDNN为与安装 CUDA 类似，不过需要注册 Nvidia 账号：
 
-官网：[cuDNN官方下载](https://link.zhihu.com/?target=https%3A//developer.nvidia.com/rdp/cudnn-download)
+[cuDNN官方下载](https://developer.nvidia.com/cudnn-downloads)
 
-国内：[cuDNN官方下载](https://link.zhihu.com/?target=https%3A//developer.nvidia.cn/rdp/cudnn-download)
+[cuDNN历史版本](https://developer.nvidia.com/rdp/cudnn-archive)
 
-官网历史版本：[cuDNN历史版本](https://link.zhihu.com/?target=https%3A//developer.nvidia.com/rdp/cudnn-archive)
 
-国内历史版本：[cuDNN历史版本](https://link.zhihu.com/?target=https%3A//developer.nvidia.cn/rdp/cudnn-archive)
-
-选择自己对应的系统以及 CUDA 版本下载即可，笔者是 Ubuntu18.04 + CUDA11.1
+选择自己对应的系统以及 CUDA 版本下载即可，例如 Ubuntu18.04 + CUDA11.6
 
 ```shell
-$ sudo dpkg -i libcudnn8_8.0.4.30-1+cuda11.1_amd64.deb
-$ sudo dpkg -i libcudnn8-dev_8.0.4.30-1+cuda11.1_amd64.deb
-$ sudo dpkg -i libcudnn8-samples_8.0.4.30-1+cuda11.1_amd64.deb
+$ sudo dpkg -i cudnn-local-repo-ubuntu1804-8.9.7.29_1.0-1_amd64.deb
 ```
 
-测试安装是否成功：
+测试安装是否成功，下载cudnn_samples_v8：
 
 ```shell
-$ cp -r /usr/src/cudnn_samples_v8/ $HOME
-$ cd  $HOME/cudnn_samples_v8/mnistCUDNN
+$ cd cudnn_samples_v8/mnistCUDNN
 $ make clean && make
 $ ./mnistCUDNN
 # 测试通过

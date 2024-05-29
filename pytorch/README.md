@@ -12,16 +12,20 @@ $ conda create -n ML python=3.10
 $ conda activate ML
 ```
 
-我这里比较懒，直接用base环境了
+根据cuda版本，可以去pytorch的[START LOCALLY](https://pytorch.org/get-started/locally/)或者[PREVIOUS VERSIONS OF PYTORCH](https://pytorch.org/get-started/previous-versions/)网页看看有什么pytorch版本适配，
 
-我们只需要一句话就可以完成Pytorch的安装
+以cuda11.6为例， 我们使用如下命令安装Pytorch
 
 ```shell
-$ pip install torch torch vision torchaudio
+$ pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu116
 ```
 
 最后我们使用如下命令测试是否可以使用GPU
 
 ```shell
-$ python -c "import torch; print(torch.cuda.is_available())
+$ python -c "import torch; print(torch.cuda.is_available())"
 ```
+
+### 参考文档
+
+- https://pytorch1x.apachecn.org/1.4/blitz/autograd_tutorial/
