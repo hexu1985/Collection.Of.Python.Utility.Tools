@@ -77,6 +77,10 @@ class RemoteAccessHelper:
         sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
         return sftp_client.remove_dir(str(remote_dir))
 
+    def move_file(self, old_path, new_path):
+        sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
+        return sftp_client.move_file(old_path=str(old_path), new_path=str(new_path))
+
     def is_exists(self, remote_path):
         sftp_client = RemoteFileTransporter(self.ssh_client.get_sftp())
         return sftp_client.is_exists(str(remote_path))

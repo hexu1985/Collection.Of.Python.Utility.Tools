@@ -139,6 +139,9 @@ class RemoteFileTransporter:
     def remove_file(self, remote_path):
         self.sftp.remove(remote_path)
 
+    def move_file(self, old_path, new_path):
+        self.sftp.posix_rename(oldpath=old_path, newpath=new_path)
+
     def is_exists(self, remote_path):
         try:
             self.sftp.stat(remote_path)
