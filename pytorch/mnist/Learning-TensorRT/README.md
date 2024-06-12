@@ -11,8 +11,34 @@ $ conda install -c conda-forge onnx
 $ python train.py
 ```
 
+### pytorch模型推理
+
+```shell
+$ python eval.py
+```
+
+或者
+
+```shell
+$ bash eval.sh
+```
+
 ### pytorch模型 转 onnx模型
 
 ```shell
 $ python torch2onnx.py
+```
+
+### onnx模型 转 tensorrt模型
+
+```shell
+$ bash build_by_cmake.sh
+$ build/build
+```
+
+### tensorrt模型推理
+
+```shell
+$ bash build_by_cmake.sh
+$ build/runtime
 ```

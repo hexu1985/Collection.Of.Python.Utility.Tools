@@ -1,3 +1,4 @@
-images
-labels
+images/
+labels/
+build/
 *-ubyte
