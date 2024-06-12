@@ -3,7 +3,9 @@ include(FindPackageHandleStandardArgs)
 
 ## 用户可以输入的TensorRT 搜索路径
 set(TensorRT_ROOT
-	""
+	"/usr/local/TensorRT-8.5.3.1/"
+	"/usr/local/TensorRT-8.5.3.1/include"
+	"/usr/local/TensorRT-8.5.3.1/lib"
 	CACHE
 	PATH
 	"TensorRT root directory")

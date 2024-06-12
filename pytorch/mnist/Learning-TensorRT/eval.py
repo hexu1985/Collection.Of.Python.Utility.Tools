@@ -10,7 +10,7 @@ from model import CNN
 def load_input_data(image_path):
     # open image file
     image = Image.open(image_path)
-    print("图像的原始维度：", np.array(image).shape)
+#    print("图像的原始维度：", np.array(image).shape)
 
     # convert to gray image
     image_transforms = transforms.Compose([
@@ -34,13 +34,13 @@ def main():
     net = CNN()
     net.load_state_dict(torch.load('mnist_net.pt'))
 
-    #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    #net = net.to(device)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    net = net.to(device)
     net.eval()
 
     image_array = load_input_data(image_path)
 
-    input_tensor = torch.as_tensor(image_array, dtype=torch.float32)
+    input_tensor = torch.as_tensor(image_array, dtype=torch.float32, device=device)
     input_tensor = input_tensor.reshape(1, 28, 28)
 
     output_tensor = net(input_tensor)
