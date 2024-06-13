@@ -41,7 +41,7 @@ def main():
     image_array = load_input_data(image_path)
 
     input_tensor = torch.as_tensor(image_array, dtype=torch.float32, device=device)
-    input_tensor = input_tensor.reshape(1, 28, 28)
+    input_tensor = input_tensor.reshape(1, 1, 28, 28)
 
     output_tensor = net(input_tensor)
     output_array = F.softmax(output_tensor, dim=1).detach().cpu().numpy()
