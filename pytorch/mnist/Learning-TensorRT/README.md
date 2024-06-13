@@ -33,12 +33,12 @@ $ python torch2onnx.py
 
 ```shell
 $ bash build_by_cmake.sh
-$ build/build
+$ build/onnx2tensorrt
 ```
 
 ### tensorrt模型推理
 
 ```shell
 $ bash build_by_cmake.sh
-$ build/runtime
+$ build/tensorrt_eval
 ```
