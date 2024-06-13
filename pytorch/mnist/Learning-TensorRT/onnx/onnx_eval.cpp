@@ -23,14 +23,26 @@ int main(int argc, char* argv[])
     std::array<int64_t, 2> output_shape{1, 10}; //model output shape,
 
     // 读取图片
-    cv::Mat img;
     std::string file_name = "img/img0.png";
     if (argc >= 2) {
         file_name = argv[1];
     }
+    cv::Mat image = cv::imread(file_name, 0);// 0为灰度图片
+    if (image.empty())  //检测image有无数据，无数据 image.empty()返回 真
+    {
+        std::cout << "Could not open or find the image" << std::endl;
+        return -1;
+    }
+
+    cv::Mat img;
+    image.convertTo(img, CV_32F);
+
     std::array<float, width * height> input_image{};
     std::array<float, 10> results{};
     int result{0};
+
+    // 将图像拷贝到input_image
+    memcpy(input_image.data(), img.data, 1 * 28 * 28 * sizeof(float));
 
     // 模型输入输出张量设置
     auto memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault);
@@ -46,6 +58,8 @@ int main(int argc, char* argv[])
 
     // 获取结果
     result = std::distance(results.begin(), std::max_element(results.begin(), results.end()));
+
+    std::cout << result << std::endl;
 
     return 0;
 }
