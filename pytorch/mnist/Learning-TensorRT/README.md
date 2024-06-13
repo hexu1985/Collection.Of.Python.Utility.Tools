@@ -32,6 +32,7 @@ $ python torch2onnx.py
 ### onnx模型 转 tensorrt模型
 
 ```shell
+$ cd tensorrt
 $ bash build_by_cmake.sh
 $ build/onnx2tensorrt
 ```
@@ -39,6 +40,7 @@ $ build/onnx2tensorrt
 ### tensorrt模型推理
 
 ```shell
+$ cd tensorrt
 $ bash build_by_cmake.sh
 $ build/tensorrt_eval
 ```
