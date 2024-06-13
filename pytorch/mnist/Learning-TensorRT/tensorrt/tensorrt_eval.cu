@@ -73,11 +73,11 @@ int main(int argc, char **argv)
     // 创建执行上下文
     auto context = unique_ptr<IExecutionContext>(engine->createExecutionContext());
 
-    auto idims = engine->getTensorShape("input.1");// 这里的名字可以在导出时修改
-    auto odims = engine->getTensorShape("23");
+    auto idims = engine->getTensorShape("input");// 这里的名字可以在导出时修改
+    auto odims = engine->getTensorShape("output");
     Dims4 inputDims = { 1, idims.d[1], idims.d[2], idims.d[3] };
     Dims2 outputDims = { 1, 10 };
-    context->setInputShape("input.1", inputDims);
+    context->setInputShape("input", inputDims);
 
     void* buffers[2];
     const int inputIndex = 0;
@@ -87,8 +87,8 @@ int main(int argc, char **argv)
 	cudaMalloc(&buffers[outputIndex], 10 * sizeof(float));
 
     // 设定数据地址
-    context->setTensorAddress("input.1", buffers[inputIndex]);
-    context->setTensorAddress("23", buffers[outputIndex]);
+    context->setTensorAddress("input", buffers[inputIndex]);
+    context->setTensorAddress("output", buffers[outputIndex]);
 
     // 创建cuda流
     cudaStream_t stream;
