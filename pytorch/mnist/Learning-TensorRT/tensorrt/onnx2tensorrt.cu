@@ -44,6 +44,9 @@ int main(int argc, char **argv)
     auto parser = unique_ptr<nvonnxparser::IParser>(nvonnxparser::createParser(*network, logger));
     // 读取文件
     char *file_path = "MNIST.onnx";
+    if (argc >= 2) {
+        file_path = argv[1];
+    }
     parser->parseFromFile(file_path, static_cast<int32_t>(ILogger::Severity::kWARNING));
 
     // 创建构建配置，用来指定trt如何优化模型
