@@ -430,7 +430,7 @@ t_ignore  = <span class="hljs-string">' \t'</span>
 
 <span class="hljs-comment"># Error handling rule</span>
 <span class="hljs-keyword">def</span> <span class="hljs-title function_">t_error</span>(<span class="hljs-params">t</span>):
-    <span class="hljs-built_in">print</span> <span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>]
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>])
     t.lexer.skip(<span class="hljs-number">1</span>)
 
 <span class="hljs-comment"># Build the lexer</span>
@@ -451,7 +451,7 @@ lexer.<span class="hljs-built_in">input</span>(data)
 <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
     tok = lexer.token()
     <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> tok: <span class="hljs-keyword">break</span>      <span class="hljs-comment"># No more input</span>
-    <span class="hljs-built_in">print</span> tok
+    <span class="hljs-built_in">print</span>(tok)
 </code></pre>
 <p>程序执行，将给出如下输出：</p>
 <pre class="highlighter-hljs" highlighted="true"><code class="highlighter-hljs hljs language-scss">$ python example<span class="hljs-selector-class">.py</span>
@@ -469,14 +469,14 @@ lexer.<span class="hljs-built_in">input</span>(data)
 <p>Lexers也同时支持迭代，你可以把上面的循环写成这样：</p>
 <pre class="highlighter-hljs" highlighted="true"><code class="highlighter-hljs hljs language-bash">
 <span class="hljs-keyword">for</span> tok <span class="hljs-keyword">in</span> lexer:
-    <span class="hljs-built_in">print</span> tok
+    <span class="hljs-built_in">print</span>(tok)
 </code></pre>
 <p>由<code>lexer.token()</code>方法返回的标记是<code>LexToken</code>类型的实例，拥有<code>tok.type</code>,<code>tok.value</code>,<code>tok.lineno</code>和<code>tok.lexpos</code>属性，下面的代码展示了如何访问这些属性：</p>
 <pre class="highlighter-hljs" highlighted="true"><code class="highlighter-hljs hljs language-python"><span class="hljs-comment"># Tokenize</span>
 <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
     tok = lexer.token()
     <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> tok: <span class="hljs-keyword">break</span>      <span class="hljs-comment"># No more input</span>
-    <span class="hljs-built_in">print</span> tok.<span class="hljs-built_in">type</span>, tok.value, tok.line, tok.lexpos
+    <span class="hljs-built_in">print</span>(tok.type, tok.value, tok.lineno, tok.lexpos)
 </code></pre>
 <p><code>tok.type</code>和<code>tok.value</code>属性表示标记本身的类型和值。<code>tok.line</code>和<code>tok.lexpos</code>属性包含了标记的位置信息，<code>tok.lexpos</code>表示标记相对于输入串起始位置的偏移。</p>
 <p>&nbsp;</p>
