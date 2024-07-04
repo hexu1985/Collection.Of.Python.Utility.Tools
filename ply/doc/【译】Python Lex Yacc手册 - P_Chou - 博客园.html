@@ -749,7 +749,7 @@ None</code></pre>
 
     <span class="hljs-comment"># Error handling rule</span>
     <span class="hljs-keyword">def</span> <span class="hljs-title function_">t_error</span>(<span class="hljs-params">self,t</span>):
-        <span class="hljs-built_in">print</span> <span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>]
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>])
         t.lexer.skip(<span class="hljs-number">1</span>)
 
     <span class="hljs-comment"># Build the lexer</span>
