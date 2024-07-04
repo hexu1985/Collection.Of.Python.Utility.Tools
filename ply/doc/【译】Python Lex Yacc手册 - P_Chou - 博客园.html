@@ -478,7 +478,7 @@ lexer.<span class="hljs-built_in">input</span>(data)
     <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> tok: <span class="hljs-keyword">break</span>      <span class="hljs-comment"># No more input</span>
     <span class="hljs-built_in">print</span>(tok.type, tok.value, tok.lineno, tok.lexpos)
 </code></pre>
-<p><code>tok.type</code>和<code>tok.value</code>属性表示标记本身的类型和值。<code>tok.line</code>和<code>tok.lexpos</code>属性包含了标记的位置信息，<code>tok.lexpos</code>表示标记相对于输入串起始位置的偏移。</p>
+<p><code>tok.type</code>和<code>tok.value</code>属性表示标记本身的类型和值。<code>tok.lineno</code>和<code>tok.lexpos</code>属性包含了标记的位置信息，<code>tok.lexpos</code>表示标记相对于输入串起始位置的偏移。</p>
 <p>&nbsp;</p>
 <p><a name="4_2" rel="noopener"></a></p>
 <h4><span style="font-weight: bold">4.2 标记列表</span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h4>
@@ -592,7 +592,7 @@ t_PRINT = <span class="hljs-string">r'print'</span></code></pre>
 <p>最后，在词法分析中遇到非法字符时，<code>t_error()</code>用来处理这类错误。这种情况下，<code>t.value</code>包含了余下还未被处理的输入字串，在之前的例子中，错误处理方法是这样的：</p>
 <pre class="highlighter-hljs" highlighted="true"><code class="highlighter-hljs hljs language-python"><span class="hljs-comment"># Error handling rule</span>
 <span class="hljs-keyword">def</span> <span class="hljs-title function_">t_error</span>(<span class="hljs-params">t</span>):
-    <span class="hljs-built_in">print</span> <span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>]
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>])
     t.lexer.skip(<span class="hljs-number">1</span>)</code></pre>
 <p>这个例子中，我们只是简单的输出不合法的字符，并且通过调用<code>t.lexer.skip(1)</code>跳过一个字符。</p>
 <p>&nbsp;</p>
@@ -609,7 +609,7 @@ lex.<span class="hljs-built_in">input</span>(sometext)
 <span class="hljs-keyword">while</span> <span class="hljs-number">1</span>:
     tok = lex.token()
     <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> tok: <span class="hljs-keyword">break</span>
-    <span class="hljs-built_in">print</span> tok</code></pre>
+    <span class="hljs-built_in">print</span>(tok)</code></pre>
 <p>在这个例子中，<code>lex.input()</code>和<code>lex.token()</code>是模块级别的方法，在lex模块中，<code>input()</code>和<code>token()</code>方法绑定到最新创建的lexer对象的对应方法上。最好不要这样用，因为这种接口可能不知道在什么时候就失效（译者注：垃圾回收？）</p>
 <p>&nbsp;</p>
 <p><a name="4_11" rel="noopener"></a></p>
@@ -695,7 +695,7 @@ t_ignore  = <span class="hljs-string">' \t'</span>
 
 <span class="hljs-comment"># Error handling rule</span>
 <span class="hljs-keyword">def</span> <span class="hljs-title function_">t_error</span>(<span class="hljs-params">t</span>):
-    <span class="hljs-built_in">print</span> <span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>]
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>])
     t.lexer.skip(<span class="hljs-number">1</span>)</code></pre>
 <p>现在，如果你想要从不同的模块中构建分析器，应该这样（在交互模式下）：</p>
 <pre class="highlighter-hljs" highlighted="true"><code class="highlighter-hljs hljs language-python-repl"><span class="hljs-meta">&gt;&gt;&gt;</span> <span class="language-python"><span class="hljs-keyword">import</span> tokrules</span>
@@ -762,7 +762,7 @@ None</code></pre>
         <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
              tok = lexer.token()
              <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> tok: <span class="hljs-keyword">break</span>
-             <span class="hljs-built_in">print</span> tok
+             <span class="hljs-built_in">print</span>(tok)
 
 <span class="hljs-comment"># Build the lexer and try it out</span>
 m = MyLexer()
@@ -809,7 +809,7 @@ tokens = (
 
     <span class="hljs-comment"># Error handling rule</span>
     <span class="hljs-keyword">def</span> <span class="hljs-title function_">t_error</span>(<span class="hljs-params">t</span>):
-        <span class="hljs-built_in">print</span> <span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>]
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">"Illegal character '%s'"</span> % t.value[<span class="hljs-number">0</span>])
         t.lexer.skip(<span class="hljs-number">1</span>)
 
     <span class="hljs-comment"># Build the lexer from my environment and return it    </span>
