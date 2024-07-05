@@ -760,7 +760,7 @@ None</code></pre>
     <span class="hljs-keyword">def</span> <span class="hljs-title function_">test</span>(<span class="hljs-params">self,data</span>):
         self.lexer.<span class="hljs-built_in">input</span>(data)
         <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
-             tok = lexer.token()
+             tok = self.lexer.token()
              <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> tok: <span class="hljs-keyword">break</span>
              <span class="hljs-built_in">print</span>(tok)
 
