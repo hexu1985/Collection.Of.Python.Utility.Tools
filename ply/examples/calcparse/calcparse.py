@@ -49,7 +49,7 @@ while True:
         s = input('calc > ')
     except EOFError:
         break
-    if not s: continue
+    if not s: break
     result = parser.parse(s)
     print(result)
 
