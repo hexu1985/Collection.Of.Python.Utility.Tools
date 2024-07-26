@@ -4,10 +4,14 @@ class Lexer:
     # List of token names.   This is always required
     tokens = (
             'NUMBER',
-            'IDENTIFIER',
             'STRING',
+            'IDENTIFIER',
             'COMMENT',
             )
+
+    def t_COMMENT(self, t):
+        r'//.*'
+        pass
 
     # A regular expression rule with some action code
     # Note addition of self parameter since we're in a class
@@ -16,20 +20,19 @@ class Lexer:
         t.value = int(t.value)    
         return t
 
-    def t_IDENTIFIER(self, t):
-        r'[A-Z_a-z][A-Z_a-z0-9]*|==|<=|>=|&&|\|\||[!"#$%&\'()*+,-./:;<=>?@[\\\]^_`{|}~]'
-        return t
-
     def t_STRING(self, t):
         r'"(\\"|\\\\|\\n|[^"])*"'
+        t.value = t.value.strip('"')
+        return t
+
+    def t_IDENTIFIER(self, t):
+        r'[A-Z_a-z][A-Z_a-z0-9]*|==|<=|>=|&&|\|\||[!"#$%&\'()*+,-./:;<=>?@[\\\]^_`{|}~]'
         return t
 
     # Define a rule so we can track line numbers
     def t_newline(self,t):
         r'\n+'
         t.lexer.lineno += len(t.value)
-
-    t_COMMENT = r'//.*'
 
     # A string containing ignored characters (spaces and tabs)
     t_ignore = ' \t'
