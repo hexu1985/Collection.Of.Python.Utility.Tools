@@ -43,7 +43,7 @@ class Lexer:
         t.lexer.skip(1)
 
     # Build the lexer
-    def build(self,**kwargs):
+    def __init__(self,**kwargs):
         self.lexer = lex.lex(module=self, **kwargs)
     
     # Test it output
@@ -57,6 +57,5 @@ class Lexer:
 if __name__ == "__main__":
     # Build the lexer and try it out
     m = Lexer()
-    m.build()           # Build the lexer
     with open('test.txt') as f:
         m.test(f.read())     # Test it
