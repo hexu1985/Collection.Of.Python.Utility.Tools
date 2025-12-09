@@ -1,6 +1,8 @@
 anaconda安装包, 清华镜像
 https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/
 
+https://repo.anaconda.com/archive/
+
 
 installation finished.
 Do you wish to update your shell profile to automatically initialize conda?
